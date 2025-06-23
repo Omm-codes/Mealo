@@ -1,0 +1,33 @@
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.loading-spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 3px solid #a0430a;
+  animation: spinner 0.8s linear infinite;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+}
+
+.spinner-medium {
+  width: 35px;
+  height: 35px;
+}
+
+.spinner-large {
+  width: 50px;
+  height: 50px;
+}
+
+@keyframes spinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

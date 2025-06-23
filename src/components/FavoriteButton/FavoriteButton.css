@@ -1,0 +1,52 @@
+.favorite-button {
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  padding: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-button:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.1);
+}
+
+.heart-icon {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+.heart-icon:before,
+.heart-icon:after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 16px;
+  background: #ccc;
+  border-radius: 50px 50px 0 0;
+  transition: background-color 0.3s ease;
+}
+
+.heart-icon:before {
+  transform: rotate(-45deg);
+  left: 0;
+}
+
+.heart-icon:after {
+  transform: rotate(45deg);
+  right: 0;
+}
+
+.favorite-button.favorited .heart-icon:before,
+.favorite-button.favorited .heart-icon:after {
+  background: #e74c3c;
+}

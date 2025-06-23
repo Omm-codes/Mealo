@@ -1,0 +1,247 @@
+.nutrition-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.nutrition-container.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.nutrition-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.nutrition-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.nutrition-title h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #a0430a;
+  font-size: 1.5rem;
+}
+
+.health-score {
+  margin-top: 0.5rem;
+}
+
+.health-score span {
+  font-size: 0.9rem;
+  color: #555;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.health-meter {
+  height: 8px;
+  background-color: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.health-fill {
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 4px;
+}
+
+.nutrition-summary {
+  display: flex;
+  justify-content: space-around;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #f7f7f7;
+  border-radius: 10px;
+}
+
+.nutrition-fact {
+  text-align: center;
+}
+
+.fact-value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #a0430a;
+}
+
+.fact-name {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.5rem;
+}
+
+.nutrition-details {
+  margin-top: 2rem;
+}
+
+.nutrition-details h4 {
+  color: #a0430a;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.nutrient-section {
+  margin-bottom: 2rem;
+}
+
+.nutrient-section h5 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.nutrient-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.5rem 1.5rem;
+}
+
+.nutrient-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dotted #eee;
+}
+
+.nutrient-name {
+  font-size: 0.9rem;
+}
+
+.nutrient-value {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.nutrient-percent {
+  font-size: 0.8rem;
+  color: #555;
+  margin-left: 5px;
+}
+
+.nutrition-disclaimer {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: #777;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.dietary-info {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.dietary-info h4 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.diet-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.diet-tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.diet-tag.vegetarian {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #388e3c;
+}
+
+.diet-tag.vegan {
+  background-color: rgba(139, 195, 74, 0.1);
+  color: #689f38;
+}
+
+.diet-tag.gluten-free {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ffa000;
+}
+
+.diet-tag.dairy-free {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+}
+
+.diet-tag.standard {
+  background-color: rgba(158, 158, 158, 0.1);
+  color: #616161;
+}
+
+.nutrition-unavailable {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.nutrition-unavailable p {
+  margin: 0.5rem 0;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .nutrition-container {
+    padding: 1.25rem;
+  }
+  
+  .nutrition-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .nutrition-title {
+    width: 100%;
+  }
+  
+  .nutrition-summary {
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .nutrition-fact {
+    flex: 1;
+    min-width: 40%;
+  }
+  
+  .nutrient-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .nutrition-container {
+    padding: 1rem;
+  }
+  
+  .fact-value {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,65 @@
+/* Category meals specific styles can be added here */
+
+.category-meals-container {
+  padding: 1rem 0;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.back-to-categories {
+  color: #a0430a;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.back-to-categories:hover {
+  color: #c25a1f;
+}
+
+.no-meals-found {
+  text-align: center;
+  padding: 3rem;
+  background: #f7f7f7;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.no-meals-found h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .category-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .category-header .page-title {
+    margin-bottom: 0;
+  }
+  
+  .back-to-categories {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .no-meals-found {
+    padding: 2rem 1rem;
+  }
+  
+  .category-header {
+    margin-bottom: 1.5rem;
+  }
+}

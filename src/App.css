@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap');
+
+body, .App {
+  background: #dfe8e6;
+  color: #333;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+}
+
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: #a0430a;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-main {
+  flex: 1;
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: calc(100% - 2rem);
+  box-sizing: border-box;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+a {
+  color: #a0430a;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #c25a1f;
+}
+
+button, input, select {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  margin: 0 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+button {
+  background: #a0430a;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease; /* Simplified transition */
+}
+
+button:hover {
+  background: #c25a1f;
+  transform: none; /* Removed vertical movement */
+  box-shadow: none; /* Removed shadow effect */
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #a0430a;
+  box-shadow: 0 0 0 2px rgba(160, 67, 10, 0.2);
+}
+
+.meal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.page-title {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.page-title:after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 3px;
+  background: #a0430a;
+  bottom: -10px;
+  left: 25%;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  color: #a0430a;
+  font-weight: 500;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .meal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .App-main {
+    padding: 1rem 0.75rem;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+  }
+  
+  button, input, select {
+    padding: 0.6rem 1rem;
+    margin: 0 0.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .meal-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  
+  .App-main {
+    padding: 1rem 0.5rem;
+  }
+  
+  .page-title:after {
+    width: 70%;
+    left: 15%;
+  }
+}
