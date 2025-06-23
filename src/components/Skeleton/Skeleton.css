@@ -9,6 +9,35 @@
 
 .skeleton-container {
   width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Make different container types match their respective grid layouts */
+.meal-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.cuisine-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.category-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* Common skeleton base properties */
+.skeleton-base {
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
 }
 
 .skeleton-text-line {
@@ -20,11 +49,16 @@
   animation: shimmer 1.5s linear infinite forwards;
 }
 
+/* Meal Card skeleton */
 .skeleton-meal-card {
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .skeleton-image {
@@ -36,6 +70,9 @@
 
 .skeleton-content {
   padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .skeleton-title {
@@ -61,19 +98,107 @@
 .skeleton-button {
   height: 36px;
   border-radius: 6px;
+  margin-top: auto;
   background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
   background-size: 800px 104px;
   animation: shimmer 1.5s linear infinite forwards;
 }
 
+/* Cuisine Card skeleton */
+.skeleton-cuisine-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.skeleton-cuisine-image {
+  height: 140px;
+  position: relative;
+  background: linear-gradient(to right, #f5f0eb 8%, #efe9e4 18%, #f5f0eb 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skeleton-cuisine-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(to right, rgba(255,255,255,0.7) 8%, rgba(255,255,255,0.5) 18%, rgba(255,255,255,0.7) 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+.skeleton-cuisine-content {
+  padding: 1.2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-cuisine-title {
+  height: 22px;
+  width: 60%;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  position: relative;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+.skeleton-cuisine-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 30px;
+  height: 3px;
+  background: linear-gradient(to right, #f1e2d9 8%, #e9d7cc 18%, #f1e2d9 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+.skeleton-cuisine-description {
+  height: 14px;
+  width: 100%;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+.skeleton-cuisine-description::after {
+  content: '';
+  display: block;
+  height: 14px;
+  width: 80%;
+  margin-top: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+/* Category Card skeleton */
 .skeleton-category-card {
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 240px;
+  width: 100%;
 }
 
 .skeleton-category-image {
@@ -106,6 +231,7 @@
   animation: shimmer 1.5s linear infinite forwards;
 }
 
+/* Ingredient skeleton */
 .skeleton-ingredient {
   display: flex;
   align-items: center;
@@ -133,4 +259,113 @@
   background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
   background-size: 800px 104px;
   animation: shimmer 1.5s linear infinite forwards;
+}
+
+/* Meal Detail skeleton */
+.skeleton-meal-detail {
+  max-width: 850px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.skeleton-meal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-meal-title {
+  height: 36px;
+  width: 60%;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+.skeleton-meal-meta {
+  display: flex;
+  gap: 10px;
+}
+
+.skeleton-meal-tag {
+  height: 24px;
+  width: 80px;
+  border-radius: 20px;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+.skeleton-image-container {
+  height: 350px;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+.skeleton-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+}
+
+.skeleton-section-title {
+  height: 24px;
+  width: 120px;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  background: linear-gradient(to right, #f6f6f6 8%, #f0f0f0 18%, #f6f6f6 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s linear infinite forwards;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .skeleton-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .skeleton-meal-card {
+    height: 300px;
+  }
+  
+  .skeleton-cuisine-card {
+    height: 260px;
+  }
+  
+  .meal-card-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+  
+  .cuisine-card-container {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+  
+  .category-card-container {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .skeleton-cuisine-card {
+    height: 240px;
+  }
+  
+  .skeleton-cuisine-image {
+    height: 120px;
+  }
+  
+  .meal-card-container,
+  .cuisine-card-container,
+  .category-card-container {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import { searchMealsByName, fetchMealsByArea, fetchAreas, advancedRecipeSearch, fetchRandomMeal } from '../../services/api';
+import { searchMealsByName, fetchMealsByArea, fetchAreas, advancedRecipeSearch, fetchRandomMeal, fetchPopularMeals, searchMealsByNamePaginated, fetchMealsByCategoryPaginated } from '../../services/api';
 import './Search.css';
 
 function Search() {
@@ -15,6 +15,12 @@ function Search() {
   const [activeTab, setActiveTab] = useState('basic');
   const [showAllAreas, setShowAllAreas] = useState(false);
   const [popularMeals, setPopularMeals] = useState([]);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
   
   // Advanced search options
   const [diet, setDiet] = useState('');
@@ -37,35 +43,15 @@ function Search() {
   ];
   
   useEffect(() => {
-    // Fetch available cuisines (areas) and popular meals on initial load
     const loadInitialData = async () => {
       try {
-        // Fetch areas
         const areasData = await fetchAreas();
         setAreas(areasData);
         
-        // Fetch popular meals for initial display
-        const params = { 
-          sort: "popularity", 
-          number: 6,
-          addRecipeInformation: true
-        };
-        
+        // Use TheMealDB for popular meals
         try {
-          const popularRecipes = await advancedRecipeSearch(params);
-          if (popularRecipes && popularRecipes.length > 0) {
-            setPopularMeals(popularRecipes);
-          } else {
-            console.warn("No popular recipes returned from API");
-            // Fallback to random meals
-            const randomMeals = [];
-            for (let i = 0; i < 6; i++) {
-              const meal = await fetchRandomMeal();
-              if (meal) randomMeals.push(meal);
-              if (randomMeals.length >= 6) break;
-            }
-            setPopularMeals(randomMeals);
-          }
+          const popularRecipes = await fetchPopularMeals(6);
+          setPopularMeals(popularRecipes);
         } catch (popularError) {
           console.error('Error fetching popular meals:', popularError);
           setPopularMeals([]);
@@ -85,42 +71,114 @@ function Search() {
     if (!query.trim() && !selectedArea) return;
     
     setLoading(true);
+    setCurrentPage(0);
     try {
-      let mealsData;
+      let result;
       if (query.trim()) {
-        mealsData = await searchMealsByName(query);
+        result = await searchMealsByNamePaginated(query, 0, 12);
       } else if (selectedArea) {
-        mealsData = await fetchMealsByArea(selectedArea);
+        result = await fetchMealsByCategoryPaginated(selectedArea, 0, 12);
       }
       
-      setMeals(mealsData);
+      setMeals(result.meals);
+      setHasMore(result.hasMore);
+      setTotalCount(result.totalCount);
       setSearched(true);
     } catch (error) {
       console.error('Error searching meals:', error);
       setMeals([]);
+      setHasMore(false);
+      setTotalCount(0);
     }
     setLoading(false);
+  };
+
+  const handleAreaChange = (area) => {
+    const newSelectedArea = area === selectedArea ? '' : area;
+    setSelectedArea(newSelectedArea);
+    
+    // Automatically trigger search when an area is selected
+    if (newSelectedArea) {
+      performBasicSearch(query, newSelectedArea);
+    } else if (query.trim()) {
+      // If area is deselected but there's a query, search by query
+      performBasicSearch(query, '');
+    } else {
+      // If both are empty, reset to initial state
+      setMeals([]);
+      setSearched(false);
+      setHasMore(false);
+      setTotalCount(0);
+    }
+  };
+
+  // Extract search logic into a separate function for reuse
+  const performBasicSearch = async (searchQuery, searchArea) => {
+    if (!searchQuery.trim() && !searchArea) return;
+    
+    setLoading(true);
+    setCurrentPage(0);
+    try {
+      let result;
+      if (searchQuery.trim()) {
+        result = await searchMealsByNamePaginated(searchQuery, 0, 12);
+      } else if (searchArea) {
+        result = await fetchMealsByCategoryPaginated(searchArea, 0, 12);
+      }
+      
+      setMeals(result.meals);
+      setHasMore(result.hasMore);
+      setTotalCount(result.totalCount);
+      setSearched(true);
+    } catch (error) {
+      console.error('Error searching meals:', error);
+      setMeals([]);
+      setHasMore(false);
+      setTotalCount(0);
+    }
+    setLoading(false);
+  };
+
+  const loadMoreMeals = async () => {
+    if (loadingMore || !hasMore) return;
+    
+    setLoadingMore(true);
+    const nextPage = currentPage + 1;
+    const offset = nextPage * 12;
+    
+    try {
+      let result;
+      if (query.trim()) {
+        result = await searchMealsByNamePaginated(query, offset, 12);
+      } else if (selectedArea) {
+        result = await fetchMealsByCategoryPaginated(selectedArea, offset, 12);
+      }
+      
+      setMeals(prev => [...prev, ...result.meals]);
+      setHasMore(result.hasMore);
+      setCurrentPage(nextPage);
+    } catch (error) {
+      console.error('Error loading more meals:', error);
+    }
+    setLoadingMore(false);
   };
   
   const handleAdvancedSearch = async (e) => {
     e.preventDefault();
     
     setLoading(true);
+    setCurrentPage(0);
     try {
-      // Create params object only including non-empty values
       const params = {};
       
-      // Only add parameters that have values
       if (query.trim()) params.query = query.trim();
       if (cuisine) params.cuisine = cuisine;
       if (diet) params.diet = diet;
       if (intolerances.length > 0) params.intolerances = intolerances.join(',');
       if (maxReadyTime > 0) params.maxReadyTime = maxReadyTime;
       
-      // Always set a number of results
       params.number = 12;
       
-      // If no search parameters are provided, search for random popular recipes
       if (Object.keys(params).length <= 1) {
         params.sort = 'popularity';
       }
@@ -128,18 +186,18 @@ function Search() {
       console.log('Searching with params:', params);
       const mealsData = await advancedRecipeSearch(params);
       setMeals(mealsData);
+      setHasMore(false); // Spoonacular handles its own pagination
+      setTotalCount(mealsData.length);
       setSearched(true);
     } catch (error) {
       console.error('Error performing advanced search:', error);
       setMeals([]);
+      setHasMore(false);
+      setTotalCount(0);
     }
     setLoading(false);
   };
 
-  const handleAreaChange = (area) => {
-    setSelectedArea(area === selectedArea ? '' : area);
-  };
-  
   const handleIntoleranceChange = (intolerance) => {
     setIntolerances(prev => 
       prev.includes(intolerance)
@@ -161,6 +219,9 @@ function Search() {
     setCuisine('');
     setIntolerances([]);
     setMaxReadyTime(60);
+    setCurrentPage(0);
+    setHasMore(false);
+    setTotalCount(0);
   };
 
   return (
@@ -212,7 +273,13 @@ function Search() {
                     </button>
                   )}
                 </div>
-                <button type="submit" className="search-button">Search</button>
+                <button 
+                  type="submit" 
+                  className="search-button"
+                  disabled={!query.trim() && !selectedArea}
+                >
+                  Search
+                </button>
               </form>
 
               <div className="search-options">
@@ -371,11 +438,31 @@ function Search() {
               </button>
             </div>
           ) : searched ? (
-            <div className="meal-grid">
-              {meals.map(meal => (
-                <MealCard key={meal.idMeal} meal={meal} />
-              ))}
-            </div>
+            <>
+              <div className="meal-grid">
+                {meals.map(meal => (
+                  <MealCard key={meal.idMeal} meal={meal} />
+                ))}
+              </div>
+              
+              {hasMore && (
+                <div className="pagination-container">
+                  <button 
+                    onClick={loadMoreMeals}
+                    className="load-more-button"
+                    disabled={loadingMore}
+                  >
+                    {loadingMore ? 'Loading...' : 'Load More Recipes'}
+                  </button>
+                </div>
+              )}
+              
+              {loadingMore && (
+                <div className="loading-more">
+                  <Skeleton type="meal-card" count={4} />
+                </div>
+              )}
+            </>
           ) : (
             <div className="popular-recipes-section">
               <h3 className="popular-recipes-title">Popular Recipes</h3>

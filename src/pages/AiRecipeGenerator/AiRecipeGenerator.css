@@ -38,31 +38,40 @@
   margin-bottom: 1rem;
 }
 
-/* Input Type Toggle */
+/* Remove input type toggle styles since we're removing that feature */
 .input-type-toggle {
+  display: none;
+}
+
+/* Add styles for trending ingredients section */
+.trending-ingredients {
+  margin: 1.5rem 0;
+}
+
+.trending-ingredients h4 {
+  border-left: 3px solid #a0430a;
+  padding-left: 10px;
+  margin: 0 0 1rem;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.popular-chips {
   display: flex;
-  margin-bottom: 1.5rem;
-  background: #f2f2f2;
-  padding: 0.5rem;
-  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.toggle-btn {
-  flex: 1;
-  padding: 0.8rem;
-  background: none;
-  border: none;
-  border-radius: 6px;
-  color: #555;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.popular-chip {
+  background: #fff3e0;
+  border: 1px solid #ffe0b2;
+  color: #e65100;
 }
 
-.toggle-btn.active {
-  background: #fff;
-  color: #a0430a;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.popular-chip:hover {
+  background: #ffe0b2;
+  border-color: #e65100;
 }
 
 .form-group {
@@ -75,6 +84,17 @@
   font-weight: 500;
   color: #333;
   font-family: 'Poppins', sans-serif;
+  position: relative;
+}
+
+.form-group label[for="ingredients"]::after {
+  content: "The more ingredients you list, the better your recipe suggestions will be";
+  display: block;
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: #666;
+  margin-top: 0.3rem;
+  font-style: italic;
 }
 
 .ai-recipe-form textarea,
@@ -97,8 +117,19 @@
 }
 
 .ai-recipe-form textarea {
-  min-height: 120px;
+  min-height: 150px;
   resize: vertical;
+}
+
+.ingredients-count {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.8rem;
+  color: #777;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
 }
 
 .form-actions {

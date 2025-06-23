@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { getAIRecipeSuggestions, advancedRecipeSearch } from '../../services/api';
+import { getAIRecipeSuggestions, fetchPopularMeals } from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import './AiRecipeGenerator.css';
 
 function AiRecipeGenerator() {
   const [ingredients, setIngredients] = useState('');
-  const [recipeName, setRecipeName] = useState('');
   const [preferences, setPreferences] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [inspirationVisible, setInspirationVisible] = useState(true);
-  const [trendingRecipes, setTrendingRecipes] = useState([]);
+  const [trendingIngredients, setTrendingIngredients] = useState([]);
   const [trendingLoading, setTrendingLoading] = useState(false);
-  
-  // Input type selection
-  const [inputType, setInputType] = useState('ingredients'); // 'ingredients' or 'recipe'
   
   // Common ingredient categories for inspiration
   const ingredientCategories = [
@@ -47,34 +43,34 @@ function AiRecipeGenerator() {
     "vegetarian", "vegan", "gluten-free", "low-carb", "high-protein", "kid-friendly"
   ];
   
-  // Fetch trending recipe names for inspiration
+  // Fetch common ingredients from popular meals
   useEffect(() => {
-    const fetchTrendingRecipes = async () => {
+    const fetchTrendingIngredients = async () => {
       setTrendingLoading(true);
       try {
-        const params = { 
-          sort: "popularity", 
-          number: 8
-        };
-        
-        const recipes = await advancedRecipeSearch(params);
-        setTrendingRecipes(recipes.map(recipe => recipe.strMeal));
+        const popularMeals = await fetchPopularMeals(5);
+        // Extract some ingredient names from popular meals
+        const extractedIngredients = new Set();
+        popularMeals.forEach(meal => {
+          for (let i = 1; i <= 5; i++) {
+            const ingredient = meal[`strIngredient${i}`];
+            if (ingredient && ingredient.trim() && ingredient.length > 2) {
+              extractedIngredients.add(ingredient.trim().toLowerCase());
+            }
+          }
+        });
+        setTrendingIngredients(Array.from(extractedIngredients).slice(0, 8));
       } catch (error) {
-        console.error("Error fetching trending recipes:", error);
-        setTrendingRecipes([
-          "Chicken Parmesan", 
-          "Beef Stir Fry", 
-          "Vegetable Curry", 
-          "Pasta Carbonara",
-          "Salmon with Roasted Vegetables", 
-          "Chocolate Chip Cookies"
+        console.error("Error fetching trending ingredients:", error);
+        setTrendingIngredients([
+          "chicken", "onion", "tomatoes", "garlic", "olive oil", "potatoes", "bell pepper", "pasta"
         ]);
       } finally {
         setTrendingLoading(false);
       }
     };
     
-    fetchTrendingRecipes();
+    fetchTrendingIngredients();
   }, []);
 
   const handleAddIngredient = (ingredient) => {
@@ -86,11 +82,6 @@ function AiRecipeGenerator() {
     } else {
       setIngredients(ingredient);
     }
-  };
-
-  const handleSetRecipeName = (name) => {
-    setRecipeName(name);
-    setInputType('recipe');
   };
 
   const handleAddCuisine = (cuisine) => {
@@ -105,17 +96,15 @@ function AiRecipeGenerator() {
   
   const handleClearForm = () => {
     setIngredients('');
-    setRecipeName('');
     setPreferences('');
     setInspirationVisible(true);
-    setInputType('ingredients');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!ingredients.trim() && !recipeName.trim()) {
-      setError('Please enter ingredients or a recipe name');
+    if (!ingredients.trim()) {
+      setError('Please enter ingredients to generate recipes');
       return;
     }
 
@@ -124,19 +113,10 @@ function AiRecipeGenerator() {
     setInspirationVisible(false);
     
     try {
-      // Prepare query based on input type
-      let queryString = '';
-      
-      if (inputType === 'ingredients') {
-        queryString = ingredients;
-      } else {
-        queryString = `Create a recipe similar to: ${recipeName}`;
-      }
-      
-      // Add preferences if provided
+      // Prepare query with ingredients and preferences
       const fullQuery = preferences.trim() 
-        ? `${queryString}. Preferences: ${preferences}`
-        : queryString;
+        ? `${ingredients}. Preferences: ${preferences}`
+        : ingredients;
         
       const suggestions = await getAIRecipeSuggestions(fullQuery);
       setRecipes(suggestions);
@@ -237,51 +217,21 @@ function AiRecipeGenerator() {
       <div className="ai-header">
         <h2 className="page-title">AI Recipe Generator</h2>
         <p className="ai-intro">
-          Enter ingredients you have on hand or a recipe name, and our AI will create custom recipes for you!
+          Enter ingredients you have on hand, and our AI will create custom recipes for you!
         </p>
       </div>
 
       <div className="ai-generator-container">
         <form onSubmit={handleSubmit} className="ai-recipe-form">
-          <div className="input-type-toggle">
-            <button 
-              type="button"
-              className={`toggle-btn ${inputType === 'ingredients' ? 'active' : ''}`}
-              onClick={() => setInputType('ingredients')}
-            >
-              I have ingredients
-            </button>
-            <button 
-              type="button"
-              className={`toggle-btn ${inputType === 'recipe' ? 'active' : ''}`}
-              onClick={() => setInputType('recipe')}
-            >
-              I want a specific recipe
-            </button>
+          <div className="form-group">
+            <label htmlFor="ingredients">What ingredients do you have? / Recipe you wanna make?</label>
+            <textarea 
+              id="ingredients"
+              placeholder="Enter ingredients separated by commas (e.g., chicken, rice, broccoli, olive oil) / Your Recipe name."
+              value={ingredients}
+              onChange={(e) => setIngredients(e.target.value)}
+            />
           </div>
-
-          {inputType === 'ingredients' ? (
-            <div className="form-group">
-              <label htmlFor="ingredients">What ingredients do you have?</label>
-              <textarea 
-                id="ingredients"
-                placeholder="Enter ingredients separated by commas (e.g., chicken, rice, broccoli, olive oil)"
-                value={ingredients}
-                onChange={(e) => setIngredients(e.target.value)}
-              />
-            </div>
-          ) : (
-            <div className="form-group">
-              <label htmlFor="recipeName">What recipe are you looking for?</label>
-              <input 
-                type="text"
-                id="recipeName"
-                placeholder="E.g., Chicken Parmesan, Vegetable Curry, Chocolate Cake, etc."
-                value={recipeName}
-                onChange={(e) => setRecipeName(e.target.value)}
-              />
-            </div>
-          )}
           
           <div className="form-group">
             <label htmlFor="preferences">Preferences or Dietary Requirements (Optional)</label>
@@ -300,7 +250,7 @@ function AiRecipeGenerator() {
             <button type="button" onClick={handleClearForm} className="clear-button">
               Clear Form
             </button>
-            <button type="submit" className="generate-button" disabled={loading}>
+            <button type="submit" className="generate-button" disabled={loading || !ingredients.trim()}>
               {loading ? 'Generating...' : 'Create Custom Recipes'}
             </button>
           </div>
@@ -310,41 +260,37 @@ function AiRecipeGenerator() {
           <div className="inspiration-section">
             <h3 className="inspiration-title">Need Inspiration?</h3>
             
-            {inputType === 'ingredients' && (
-              <>
-                <div className="ingredient-categories">
-                  {ingredientCategories.map((category, idx) => (
-                    <div key={idx} className="ingredient-category">
-                      <h4>{category.name}</h4>
-                      <div className="ingredient-chips">
-                        {category.items.map((item, i) => (
-                          <button 
-                            key={i} 
-                            type="button" 
-                            className="ingredient-chip"
-                            onClick={() => handleAddIngredient(item)}
-                          >
-                            {item}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+            <div className="ingredient-categories">
+              {ingredientCategories.map((category, idx) => (
+                <div key={idx} className="ingredient-category">
+                  <h4>{category.name}</h4>
+                  <div className="ingredient-chips">
+                    {category.items.map((item, i) => (
+                      <button 
+                        key={i} 
+                        type="button" 
+                        className="ingredient-chip"
+                        onClick={() => handleAddIngredient(item)}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </>
-            )}
+              ))}
+            </div>
             
-            {inputType === 'recipe' && !trendingLoading && (
-              <div className="trending-recipes">
-                <h4>Trending Recipe Ideas</h4>
-                <div className="recipe-name-chips">
-                  {trendingRecipes.map((recipe, idx) => (
+            {!trendingLoading && trendingIngredients.length > 0 && (
+              <div className="trending-ingredients">
+                <h4>Popular Ingredients</h4>
+                <div className="ingredient-chips popular-chips">
+                  {trendingIngredients.map((ingredient, idx) => (
                     <button 
                       key={idx} 
-                      className="recipe-name-chip" 
-                      onClick={() => handleSetRecipeName(recipe)}
+                      className="ingredient-chip popular-chip" 
+                      onClick={() => handleAddIngredient(ingredient)}
                     >
-                      {recipe}
+                      {ingredient}
                     </button>
                   ))}
                 </div>
@@ -427,3 +373,4 @@ function AiRecipeGenerator() {
 }
 
 export default AiRecipeGenerator;
+              

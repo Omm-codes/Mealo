@@ -70,7 +70,7 @@ const markMealDBMeal = (meal) => {
   };
 };
 
-// Random meal - Using TheMealDB for simplicity and speed
+// Enhanced random meal with better error handling
 export const fetchRandomMeal = async () => {
   try {
     const response = await fetch(`${MEAL_DB_BASE_URL}/random.php`);
@@ -78,7 +78,7 @@ export const fetchRandomMeal = async () => {
     return data.meals ? markMealDBMeal(data.meals[0]) : null;
   } catch (error) {
     console.error('Error fetching random meal:', error);
-    throw error;
+    return null; // Return null instead of throwing to allow graceful handling
   }
 };
 
@@ -106,6 +106,29 @@ export const fetchMealById = async (id) => {
   }
 };
 
+// Enhanced search with pagination support
+export const searchMealsByNamePaginated = async (query, offset = 0, limit = 12) => {
+  try {
+    const response = await fetch(`${MEAL_DB_BASE_URL}/search.php?s=${query}`);
+    const data = await response.json();
+    const meals = data.meals ? data.meals.map(meal => markMealDBMeal(meal)) : [];
+    
+    // Simulate pagination for TheMealDB (since it doesn't support it natively)
+    const startIndex = offset;
+    const endIndex = startIndex + limit;
+    const paginatedMeals = meals.slice(startIndex, endIndex);
+    
+    return {
+      meals: paginatedMeals,
+      totalCount: meals.length,
+      hasMore: endIndex < meals.length
+    };
+  } catch (error) {
+    console.error('Error searching meals:', error);
+    return { meals: [], totalCount: 0, hasMore: false };
+  }
+};
+
 // Search meals by name - Using TheMealDB for basic name search
 export const searchMealsByName = async (query) => {
   try {
@@ -118,6 +141,28 @@ export const searchMealsByName = async (query) => {
   }
 };
 
+// Enhanced category meals with pagination
+export const fetchMealsByCategoryPaginated = async (category, offset = 0, limit = 12) => {
+  try {
+    const response = await fetch(`${MEAL_DB_BASE_URL}/filter.php?c=${category}`);
+    const data = await response.json();
+    const meals = data.meals ? data.meals.map(meal => markMealDBMeal(meal)) : [];
+    
+    const startIndex = offset;
+    const endIndex = startIndex + limit;
+    const paginatedMeals = meals.slice(startIndex, endIndex);
+    
+    return {
+      meals: paginatedMeals,
+      totalCount: meals.length,
+      hasMore: endIndex < meals.length
+    };
+  } catch (error) {
+    console.error(`Error fetching meals for category ${category}:`, error);
+    return { meals: [], totalCount: 0, hasMore: false };
+  }
+};
+
 // Fetch meals by category - Using TheMealDB for basic category search
 export const fetchMealsByCategory = async (category) => {
   try {
@@ -127,6 +172,28 @@ export const fetchMealsByCategory = async (category) => {
   } catch (error) {
     console.error(`Error fetching meals for category ${category}:`, error);
     throw error;
+  }
+};
+
+// Get popular meals from TheMealDB instead of Spoonacular
+export const fetchPopularMeals = async (count = 6) => {
+  try {
+    const meals = [];
+    const maxAttempts = count * 2; // Try more to get unique meals
+    const seenIds = new Set();
+    
+    for (let i = 0; i < maxAttempts && meals.length < count; i++) {
+      const meal = await fetchRandomMeal();
+      if (meal && !seenIds.has(meal.idMeal)) {
+        seenIds.add(meal.idMeal);
+        meals.push(meal);
+      }
+    }
+    
+    return meals;
+  } catch (error) {
+    console.error('Error fetching popular meals:', error);
+    return [];
   }
 };
 
@@ -168,19 +235,29 @@ export const fetchAreas = async () => {
 
 // NEW API FEATURES
 
-// Advanced recipe search with filters - Using Spoonacular
+// Advanced recipe search - ONLY use Spoonacular when necessary
 export const advancedRecipeSearch = async (params) => {
   try {
-    // Clean up empty parameters to avoid API errors
+    // Only use Spoonacular for truly advanced searches
+    const isAdvancedSearch = params.diet || params.intolerances || params.maxReadyTime || 
+                           params.sort === 'popularity' || params.cuisine;
+    
+    if (!isAdvancedSearch && params.query) {
+      // Use TheMealDB for basic searches
+      console.log('Using TheMealDB for basic search');
+      const result = await searchMealsByNamePaginated(params.query, 0, params.number || 10);
+      return result.meals;
+    }
+    
+    // Use Spoonacular for advanced features
+    console.log('Using Spoonacular for advanced search');
     const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-      // Only include parameters that have actual values
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value;
       }
       return acc;
     }, {});
     
-    // Always include these parameters
     const queryParams = new URLSearchParams({
       apiKey: SPOONACULAR_API_KEY,
       ...cleanParams,
@@ -189,40 +266,30 @@ export const advancedRecipeSearch = async (params) => {
       number: params.number || 10
     });
 
-    console.log('Advanced search request URL:', `${SPOONACULAR_BASE_URL}/recipes/complexSearch?` + queryParams);
-
     const response = await fetch(`${SPOONACULAR_BASE_URL}/recipes/complexSearch?${queryParams}`);
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API responded with status: ${response.status}, Error: ${errorText}`);
       throw new Error(`API responded with status: ${response.status}`);
     }
     
     const data = await response.json();
     
-    // Add more detailed error checking
     if (data.code && data.message) {
       console.error("Spoonacular API error:", data.message);
       return [];
     }
     
-    // Ensure we handle the results properly
     if (!data.results || !Array.isArray(data.results)) {
       console.error("Unexpected data format:", data);
       return [];
     }
     
-    console.log(`Advanced search found ${data.results.length} results`);
-    
-    // Map the results to our app's format
     const formattedResults = data.results
       .map(recipe => formatSpoonacularRecipeCard(recipe))
-      .filter(recipe => recipe !== null); // Remove any null results
+      .filter(recipe => recipe !== null);
       
     return formattedResults;
   } catch (error) {
     console.error('Error performing advanced recipe search:', error);
-    // Return empty array instead of throwing to avoid breaking the UI
     return [];
   }
 };

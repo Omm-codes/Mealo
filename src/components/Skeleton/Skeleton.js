@@ -28,6 +28,20 @@ function Skeleton({ type = 'text-line', count = 1 }) {
             </div>
           );
           break;
+        
+        case 'cuisine-card':
+          items.push(
+            <div key={i} className="skeleton-cuisine-card">
+              <div className="skeleton-cuisine-image">
+                <div className="skeleton-cuisine-icon"></div>
+              </div>
+              <div className="skeleton-cuisine-content">
+                <div className="skeleton-cuisine-title"></div>
+                <div className="skeleton-cuisine-description"></div>
+              </div>
+            </div>
+          );
+          break;
           
         case 'ingredient':
           items.push(
@@ -48,8 +62,11 @@ function Skeleton({ type = 'text-line', count = 1 }) {
     return items;
   };
   
+  // Use the type to determine the container class
+  const containerClass = `skeleton-container ${type}-container`;
+  
   return (
-    <div className="skeleton-container">
+    <div className={containerClass}>
       {renderSkeletonItems()}
     </div>
   );

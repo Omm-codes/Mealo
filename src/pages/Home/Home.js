@@ -2,29 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import { fetchRandomMeal, advancedRecipeSearch, fetchAreas } from '../../services/api';
+import { fetchRandomMeal, advancedRecipeSearch, fetchAreas, fetchPopularMeals } from '../../services/api';
 import './Home.css';
 
 function Home() {
   const [randomMeals, setRandomMeals] = useState([]);
-  const [spoonacularMeals, setSpoonacularMeals] = useState([]);
+  const [trendingMeals, setTrendingMeals] = useState([]);
   const [cuisines, setCuisines] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [spoonacularLoading, setSpoonacularLoading] = useState(true);
+  const [trendingLoading, setTrendingLoading] = useState(true);
   const [cuisineLoading, setCuisineLoading] = useState(true);
 
   useEffect(() => {
     const loadRandomMeals = async () => {
       setLoading(true);
       try {
-        // Fetch 3 random meals
-        const meals = [];
-        for (let i = 0; i < 3; i++) {
-          const meal = await fetchRandomMeal();
-          if (meal) {
-            meals.push(meal);
-          }
-        }
+        // Use TheMealDB for featured meals
+        const meals = await fetchPopularMeals(3);
         setRandomMeals(meals);
       } catch (error) {
         console.error('Error fetching random meals:', error);
@@ -32,46 +26,23 @@ function Home() {
       setLoading(false);
     };
 
-    const loadSpoonacularMeals = async () => {
-      setSpoonacularLoading(true);
+    const loadTrendingMeals = async () => {
+      setTrendingLoading(true);
       try {
-        // Get some trending recipes from Spoonacular
-        const params = { 
-          sort: "popularity", 
-          number: 3,
-          addRecipeInformation: true
-        };
-        const meals = await advancedRecipeSearch(params);
-        
-        // Check if we got valid meals back
-        if (meals && meals.length > 0) {
-          setSpoonacularMeals(meals);
-        } else {
-          console.warn("No valid meals returned from Spoonacular API");
-          // Fallback to random meals if Spoonacular fails
-          const fallbackMeals = [];
-          for (let i = 0; i < 3; i++) {
-            const meal = await fetchRandomMeal();
-            if (meal) {
-              fallbackMeals.push(meal);
-            }
-          }
-          setSpoonacularMeals(fallbackMeals);
-        }
+        // Use TheMealDB for trending meals too - just get different random meals
+        const meals = await fetchPopularMeals(3);
+        setTrendingMeals(meals);
       } catch (error) {
-        console.error('Error fetching Spoonacular meals:', error);
-        // Set empty array to prevent endless loading
-        setSpoonacularMeals([]);
-      } finally {
-        setSpoonacularLoading(false);
+        console.error('Error fetching trending meals:', error);
+        setTrendingMeals([]);
       }
+      setTrendingLoading(false);
     };
 
     const loadCuisines = async () => {
       setCuisineLoading(true);
       try {
         const allCuisines = await fetchAreas();
-        // Get 6 random cuisines
         const shuffled = [...allCuisines].sort(() => 0.5 - Math.random());
         setCuisines(shuffled.slice(0, 6));
       } catch (error) {
@@ -80,8 +51,14 @@ function Home() {
       setCuisineLoading(false);
     };
 
+    // Load content progressively
     loadRandomMeals();
-    loadSpoonacularMeals();
+    
+    // Delay trending meals to reduce concurrent API calls
+    setTimeout(() => {
+      loadTrendingMeals();
+    }, 1000);
+    
     loadCuisines();
   }, []);
 
@@ -164,13 +141,13 @@ function Home() {
           <h2 className="section-title">Trending Recipes</h2>
           <p className="section-subtitle">Popular dishes people are cooking right now</p>
         </div>
-        {spoonacularLoading ? (
+        {trendingLoading ? (
           <div className="meal-grid">
             <Skeleton type="meal-card" count={3} />
           </div>
-        ) : spoonacularMeals.length > 0 ? (
+        ) : trendingMeals.length > 0 ? (
           <div className="meal-grid">
-            {spoonacularMeals.map(meal => (
+            {trendingMeals.map(meal => (
               <MealCard key={meal.idMeal} meal={meal} />
             ))}
           </div>
@@ -179,7 +156,7 @@ function Home() {
             <p>Unable to load trending recipes at this time.</p>
           </div>
         )}
-        <p className="api-attribution">Powered by Spoonacular</p>
+        <p className="api-attribution">Powered by TheMealDB</p>
       </section>
       
       <section className="section featured-section">
