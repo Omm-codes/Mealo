@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import './Header.css';
+// Import logo from assets directory
+import logo from '../../assets/logo.png'; // Update this path to match your actual logo file
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -36,7 +38,9 @@ function Header() {
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         <Link to="/" className="logo">
-          <div className="logo-icon">🍛</div>
+          <div className="logo-icon">
+            <img src={logo} alt="Mealo Logo" className="site-logo" />
+          </div>
           <span className="logo-text">Mealo</span>
         </Link>
         

@@ -12,6 +12,8 @@ import Favorites from './pages/Favorites/Favorites';
 import AiRecipeGenerator from './pages/AiRecipeGenerator/AiRecipeGenerator';
 import NutritionAnalysis from './pages/NutritionAnalysis/NutritionAnalysis';
 import MealPlanner from './pages/MealPlanner/MealPlanner';
+import About from './pages/About/About';
+import Contact from './pages/Contact/Contact';
 import PageNotFound from './pages/PageNotFound/PageNotFound';
 
 function App() {
@@ -30,6 +32,8 @@ function App() {
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/ai-recipe-generator" element={<AiRecipeGenerator />} />
             <Route path="/meal-planner" element={<MealPlanner />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </main>

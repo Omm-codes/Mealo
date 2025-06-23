@@ -20,7 +20,7 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.5rem;
 }
 
 .logo {
@@ -39,15 +39,22 @@
 }
 
 .logo-icon {
-  font-size: 1.5rem;
   margin-right: 0.5rem;
-  animation: float 3s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
-  100% { transform: translateY(0px); }
+.site-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(160, 67, 10, 0.2));
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .site-logo {
+  transform: rotate(10deg);
 }
 
 .logo-text {
@@ -57,6 +64,7 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 1px 3px rgba(160, 67, 10, 0.1);
+  letter-spacing: 0.5px;
 }
 
 .mobile-menu-btn {
@@ -260,6 +268,8 @@
   display: inline-block;
   margin-right: 0.8rem;
   font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
 }
 
 /* Mobile Responsive */
