@@ -2,7 +2,7 @@
 
 MEALO is a modern, feature-rich recipe platform that helps users discover, save, and create delicious meals from around the world. Combining traditional recipes with cutting-edge AI technology, MEALO makes cooking accessible and enjoyable for everyone.
 
-![MEALO Screenshot](./screenshots/homepage.png)
+![MEALO Screenshot](./screenshots/homepage.jpg)
 
 ## 🌟 Features
 
