@@ -82,7 +82,7 @@ function Contact() {
             </div>
             <h3>Email Us</h3>
             <p>For general inquiries and support</p>
-            <a href="mailto:hello@mealo.app">hello@mealo.app</a>
+            <a href="mailto:hello@mealo.app">omsanjay975@gmail.com</a>
           </div>
           
           <div className="contact-method">
@@ -93,7 +93,7 @@ function Contact() {
             </div>
             <h3>Call Us</h3>
             <p>Monday to Friday, 9am - 5pm</p>
-            <a href="tel:+15551234567">+1 (555) 123-4567</a>
+            <a href="tel:+15551234567">7721903888</a>
           </div>
           
           <div className="contact-method">
@@ -104,7 +104,7 @@ function Contact() {
             </div>
             <h3>Location</h3>
             <p>123 Recipe Street</p>
-            <p>Foodville, CA 90210</p>
+            <p>Thane, India</p>
           </div>
           
           <div className="social-contact">

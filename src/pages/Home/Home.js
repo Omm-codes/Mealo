@@ -147,9 +147,12 @@ function Home() {
           </div>
         </div>
         <div className="hero-image-container">
-          <img src="https://images.unsplash.com/photo-1543339308-43e59d6b73a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
-               alt="Food hero" 
-               className="hero-image" />
+          <img 
+            src="https://images.unsplash.com/photo-1543339308-43e59d6b73a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
+            alt="Food hero" 
+            className="hero-image"
+            loading="eager" // Add eager loading for the hero image
+          />
         </div>
       </section>
 
@@ -161,7 +164,7 @@ function Home() {
         
         {cuisineLoading ? (
           <div className="cuisines-grid">
-            <Skeleton type="cuisine-card" count={6} />
+            <Skeleton type="cuisine-card" count={window.innerWidth <= 480 ? 3 : 6} />
           </div>
         ) : (
           <>
@@ -176,6 +179,7 @@ function Home() {
                     }} 
                     key={index} 
                     className="cuisine-card"
+                    aria-label={`Browse ${cuisine.strArea} recipes`}
                   >
                     <div 
                       className="cuisine-image" 
@@ -231,21 +235,21 @@ function Home() {
           <p className="section-subtitle">Make your cooking experience more enjoyable</p>
         </div>
         <div className="tools-grid">
-          <Link to="/ai-recipe-generator" className="tool-card ai-tool">
+          <Link to="/ai-recipe-generator" className="tool-card ai-tool" aria-label="AI Recipe Generator Tool">
             <div className="tool-card-bg"></div>
             <div className="tool-content">
               <div className="tool-icon">
-                <svg viewBox="0 0 24 24" width="32" height="32">
+                <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true">
                   <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/>
                 </svg>
               </div>
               <h3>AI Recipe Generator</h3>
               <p>Create custom recipes from ingredients you have on hand</p>
-              <span className="tool-link">Try It Now <span className="arrow">→</span></span>
+              <span className="tool-link">Try It Now <span className="arrow" aria-hidden="true">→</span></span>
             </div>
           </Link>
           
-          <Link to="/meal-planner" className="tool-card planner-tool">
+          <Link to="/meal-planner" className="tool-card planner-tool" aria-label="Meal Planner Tool">
             <div className="tool-card-bg"></div>
             <div className="tool-content">
               <div className="tool-icon">
@@ -259,7 +263,7 @@ function Home() {
             </div>
           </Link>
           
-          <Link to="/nutrition/659315" className="tool-card nutrition-tool">
+          <Link to="/nutrition/659315" className="tool-card nutrition-tool" aria-label="Nutrition Analysis Tool">
             <div className="tool-card-bg"></div>
             <div className="tool-content">
               <div className="tool-icon">
