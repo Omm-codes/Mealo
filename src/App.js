@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import Home from './pages/Home/Home';
 import Search from './pages/Search/Search';
 import MealDetail from './pages/MealDetail/MealDetail';
@@ -19,6 +20,7 @@ import PageNotFound from './pages/PageNotFound/PageNotFound';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="App">
         <Header />
         <main className="App-main">
