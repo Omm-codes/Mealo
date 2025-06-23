@@ -4,7 +4,8 @@
 
 .search-hero {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem; /* Increased from 2rem */
+  padding: 1.5rem 0; /* Added padding */
 }
 
 .search-hero h2.page-title {
@@ -12,13 +13,15 @@
   font-weight: 700;
   color: #a0430a;
   font-size: 2.2rem;
+  margin-bottom: 1rem; /* Increased from implicit value */
+  display: block; /* Ensure it's a block element */
 }
 
 .search-subtitle {
   color: #666;
   font-size: 1.1rem;
-  margin-top: -0.5rem;
-  margin-bottom: 2rem;
+  margin: 0 auto 1rem; /* Changed from negative top margin */
+  max-width: 700px; /* Limit width for better readability */
   font-family: 'Poppins', sans-serif;
 }
 
@@ -217,16 +220,10 @@
 }
 
 .form-group label {
-  display: flex;
-  align-items: center;
+  display: block;
   margin-bottom: 0.7rem;
   font-weight: 500;
   color: #444;
-}
-
-.input-icon {
-  margin-right: 0.5rem;
-  font-size: 1.1em;
 }
 
 .advanced-search-form input,
@@ -251,6 +248,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  background: #f8f8f8;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
 }
 
 input[type="range"] {
@@ -260,6 +260,8 @@ input[type="range"] {
   background: #e0e0e0;
   border-radius: 3px;
   outline: none;
+  border: none;
+  padding: 0;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -280,6 +282,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   min-width: 60px;
   font-weight: 500;
   color: #444;
+  text-align: center;
 }
 
 .intolerances-container {
@@ -295,6 +298,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.intolerance-checkbox:hover {
+  background: #f0f0f0;
 }
 
 .intolerance-checkbox input {
@@ -503,6 +514,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .popular-recipes-subtitle {
     font-size: 0.95rem;
   }
+
+  .search-hero h2.page-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .search-subtitle {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -554,6 +574,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
   
   .popular-recipes-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .search-hero {
+    margin-bottom: 1.5rem;
+    padding: 1rem 0;
+  }
+  
+  .search-hero h2.page-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.7rem;
+  }
+  
+  .search-subtitle {
     font-size: 0.9rem;
   }
 }

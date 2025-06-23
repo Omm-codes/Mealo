@@ -107,15 +107,25 @@ function Search() {
     
     setLoading(true);
     try {
-      const params = {
-        query: query,
-        cuisine: cuisine,
-        diet: diet,
-        intolerances: intolerances.join(','),
-        maxReadyTime: maxReadyTime,
-        number: 12
-      };
+      // Create params object only including non-empty values
+      const params = {};
       
+      // Only add parameters that have values
+      if (query.trim()) params.query = query.trim();
+      if (cuisine) params.cuisine = cuisine;
+      if (diet) params.diet = diet;
+      if (intolerances.length > 0) params.intolerances = intolerances.join(',');
+      if (maxReadyTime > 0) params.maxReadyTime = maxReadyTime;
+      
+      // Always set a number of results
+      params.number = 12;
+      
+      // If no search parameters are provided, search for random popular recipes
+      if (Object.keys(params).length <= 1) {
+        params.sort = 'popularity';
+      }
+      
+      console.log('Searching with params:', params);
       const mealsData = await advancedRecipeSearch(params);
       setMeals(mealsData);
       setSearched(true);
@@ -233,7 +243,7 @@ function Search() {
               <div className="form-row">
                 <div className="form-group search-term-group">
                   <label htmlFor="query">
-                    <span className="input-icon"></span> Recipe Name or Ingredients
+                    Recipe Name or Ingredients
                   </label>
                   <input
                     type="text"
@@ -248,7 +258,7 @@ function Search() {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="diet">
-                    <span className="input-icon">🥗</span> Diet
+                    Diet
                   </label>
                   <select 
                     id="diet" 
@@ -263,7 +273,7 @@ function Search() {
                 
                 <div className="form-group">
                   <label htmlFor="cuisine">
-                    <span className="input-icon">🌍</span> Cuisine
+                    Cuisine
                   </label>
                   <select 
                     id="cuisine" 
@@ -281,7 +291,7 @@ function Search() {
                 
                 <div className="form-group">
                   <label htmlFor="maxReadyTime">
-                    <span className="input-icon">⏱️</span> Max Time (minutes)
+                    Max Time (minutes)
                   </label>
                   <div className="range-input-container">
                     <input
@@ -300,7 +310,7 @@ function Search() {
               
               <div className="form-group">
                 <label>
-                  <span className="input-icon">⚠️</span> Exclude Intolerances
+                  Exclude Intolerances
                 </label>
                 <div className="intolerances-container">
                   {availableIntolerances.map(intolerance => (

@@ -6,13 +6,23 @@
 
 .categories-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem; /* Increased from 2rem */
+  padding: 1rem 0; /* Added padding */
+}
+
+.categories-header h2.page-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: #a0430a;
+  font-size: 2.2rem;
+  margin-bottom: 1rem; /* Added specific margin */
+  display: block; /* Ensure it's a block element */
 }
 
 .categories-subtitle {
   color: #666;
   font-size: 1.1rem;
-  margin: -0.5rem auto 1.5rem;
+  margin: 0 auto 1.5rem; /* Changed from negative top margin */
   max-width: 600px;
   font-family: 'Poppins', sans-serif;
 }
@@ -189,6 +199,15 @@
   
   .category-card {
     min-height: 380px; /* Adjusted for smaller screens */
+  }
+  
+  .categories-header {
+    margin-bottom: 2rem;
+  }
+  
+  .categories-header h2.page-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
   }
   
   .categories-subtitle {

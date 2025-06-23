@@ -171,17 +171,33 @@ export const fetchAreas = async () => {
 // Advanced recipe search with filters - Using Spoonacular
 export const advancedRecipeSearch = async (params) => {
   try {
+    // Clean up empty parameters to avoid API errors
+    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
+      // Only include parameters that have actual values
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+    
+    // Always include these parameters
     const queryParams = new URLSearchParams({
       apiKey: SPOONACULAR_API_KEY,
-      ...params,
+      ...cleanParams,
       addRecipeInformation: true,
+      fillIngredients: true,
       number: params.number || 10
     });
 
+    console.log('Advanced search request URL:', `${SPOONACULAR_BASE_URL}/recipes/complexSearch?` + queryParams);
+
     const response = await fetch(`${SPOONACULAR_BASE_URL}/recipes/complexSearch?${queryParams}`);
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API responded with status: ${response.status}, Error: ${errorText}`);
       throw new Error(`API responded with status: ${response.status}`);
     }
+    
     const data = await response.json();
     
     // Add more detailed error checking
@@ -196,7 +212,14 @@ export const advancedRecipeSearch = async (params) => {
       return [];
     }
     
-    return data.results.map(recipe => formatSpoonacularRecipeCard(recipe));
+    console.log(`Advanced search found ${data.results.length} results`);
+    
+    // Map the results to our app's format
+    const formattedResults = data.results
+      .map(recipe => formatSpoonacularRecipeCard(recipe))
+      .filter(recipe => recipe !== null); // Remove any null results
+      
+    return formattedResults;
   } catch (error) {
     console.error('Error performing advanced recipe search:', error);
     // Return empty array instead of throwing to avoid breaking the UI
