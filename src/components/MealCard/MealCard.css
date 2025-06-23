@@ -22,7 +22,7 @@
 .meal-card-image-container {
   position: relative;
   overflow: hidden;
-  height: 200px;
+  height: 140px; /* Changed from 200px to match cuisine card height */
   background-color: #f5f5f5; /* Light background for loading state */
 }
 
@@ -140,6 +140,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 140px; /* Added to ensure consistent card height */
 }
 
 .meal-card-header {
@@ -231,7 +232,7 @@
 
 @media (max-width: 768px) {
   .meal-card-image-container {
-    height: 180px;
+    height: 140px; /* Changed from 180px to match cuisine cards */
   }
   
   .meal-card-content {
@@ -245,7 +246,7 @@
 
 @media (max-width: 480px) {
   .meal-card-image-container {
-    height: 200px; /* Larger images on mobile for better visibility */
+    height: 120px; /* Changed from 200px to match cuisine card mobile height */
   }
   
   .meal-card {

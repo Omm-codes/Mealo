@@ -85,8 +85,8 @@ function Categories() {
                   <div>
                     <h3>{category.strCategory}</h3>
                     <p className="category-description">
-                      {category.strCategoryDescription.length > 120 
-                        ? `${category.strCategoryDescription.substring(0, 120)}...` 
+                      {category.strCategoryDescription.length > 90
+                        ? `${category.strCategoryDescription.substring(0, 90)}...` 
                         : category.strCategoryDescription}
                     </p>
                   </div>

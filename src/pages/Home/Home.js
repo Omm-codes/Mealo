@@ -43,10 +43,27 @@ function Home() {
       setCuisineLoading(true);
       try {
         const allCuisines = await fetchAreas();
-        const shuffled = [...allCuisines].sort(() => 0.5 - Math.random());
-        setCuisines(shuffled.slice(0, 6));
+        
+        // Define our required cuisines - make sure these are exactly as returned by the API
+        const requiredCuisines = [
+          'American', 'Thai', 'Italian', 'French', 
+          'Spanish', 'Turkish', 'Chinese', 'Indian'
+        ];
+        
+        // Create cuisine objects directly instead of filtering from API results
+        // This ensures we always have our required cuisines in the right format
+        const displayCuisines = requiredCuisines.map(name => ({ strArea: name }));
+        
+        // Use exactly 8 cuisines, the ones we specified
+        setCuisines(displayCuisines);
       } catch (error) {
         console.error('Error fetching cuisines:', error);
+        // In case of error, still show our required cuisines
+        const fallbackCuisines = [
+          'American', 'Thai', 'Italian', 'French', 
+          'Spanish', 'Turkish', 'Chinese', 'Indian'
+        ].map(name => ({ strArea: name }));
+        setCuisines(fallbackCuisines);
       }
       setCuisineLoading(false);
     };
@@ -136,47 +153,6 @@ function Home() {
         </div>
       </section>
 
-      <section className="section trending-section">
-        <div className="section-header">
-          <h2 className="section-title">Trending Recipes</h2>
-          <p className="section-subtitle">Popular dishes people are cooking right now</p>
-        </div>
-        {trendingLoading ? (
-          <div className="meal-grid">
-            <Skeleton type="meal-card" count={3} />
-          </div>
-        ) : trendingMeals.length > 0 ? (
-          <div className="meal-grid">
-            {trendingMeals.map(meal => (
-              <MealCard key={meal.idMeal} meal={meal} />
-            ))}
-          </div>
-        ) : (
-          <div className="api-error-message">
-            <p>Unable to load trending recipes at this time.</p>
-          </div>
-        )}
-        <p className="api-attribution">Powered by TheMealDB</p>
-      </section>
-      
-      <section className="section featured-section">
-        <div className="section-header">
-          <h2 className="section-title">Featured Meals</h2>
-          <p className="section-subtitle">Discover something new and exciting today</p>
-        </div>
-        {loading ? (
-          <div className="meal-grid">
-            <Skeleton type="meal-card" count={3} />
-          </div>
-        ) : (
-          <div className="meal-grid">
-            {randomMeals.map(meal => (
-              <MealCard key={meal.idMeal} meal={meal} />
-            ))}
-          </div>
-        )}
-      </section>
-
       <section className="section cuisines-section">
         <div className="section-header">
           <h2 className="section-title">Explore World Cuisines</h2>
@@ -228,6 +204,24 @@ function Home() {
               </Link>
             </div>
           </>
+        )}
+      </section>
+
+      <section className="section featured-section">
+        <div className="section-header">
+          <h2 className="section-title">Featured Meals</h2>
+          <p className="section-subtitle">Discover something new and exciting today</p>
+        </div>
+        {loading ? (
+          <div className="meal-grid">
+            <Skeleton type="meal-card" count={3} />
+          </div>
+        ) : (
+          <div className="meal-grid">
+            {randomMeals.map(meal => (
+              <MealCard key={meal.idMeal} meal={meal} />
+            ))}
+          </div>
         )}
       </section>
       
@@ -316,5 +310,7 @@ const getCuisineEmoji = (cuisine) => {
 
   return emojiMap[cuisine] || '🌍';
 };
+
+
 
 export default Home;

@@ -12,6 +12,7 @@ function AiRecipeGenerator() {
   const [inspirationVisible, setInspirationVisible] = useState(true);
   const [trendingIngredients, setTrendingIngredients] = useState([]);
   const [trendingLoading, setTrendingLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   
   // Common ingredient categories for inspiration
   const ingredientCategories = [
@@ -111,6 +112,18 @@ function AiRecipeGenerator() {
     setLoading(true);
     setError('');
     setInspirationVisible(false);
+    setLoadingStep(0);
+    
+    // Set up step transitions
+    const stepTimer = setInterval(() => {
+      setLoadingStep(prev => {
+        if (prev >= 2) {
+          clearInterval(stepTimer);
+          return 2;
+        }
+        return prev + 1;
+      });
+    }, 5000); // Change step every 5 seconds
     
     try {
       // Prepare query with ingredients and preferences
@@ -125,6 +138,7 @@ function AiRecipeGenerator() {
       setError('Failed to generate recipes. Please try again later.');
     } finally {
       setLoading(false);
+      clearInterval(stepTimer); // Make sure to clear the timer
     }
   };
 
@@ -329,16 +343,40 @@ function AiRecipeGenerator() {
       </div>
 
       {loading && (
-        <div className="loading-container">
-          <div className="cooking-animation">
-            <LoadingSpinner size="large" />
-            <div className="cooking-bubbles">
-              <div className="bubble"></div>
-              <div className="bubble"></div>
-              <div className="bubble"></div>
+        <div className="loading-container entered">
+          <div className="loading-animation">
+            <div className="cooking-pot">
+              <div className="pot-body">
+                <div className="steam-container">
+                  <div className="steam steam-1"></div>
+                  <div className="steam steam-2"></div>
+                  <div className="steam steam-3"></div>
+                  <div className="steam steam-4"></div>
+                </div>
+                <div className="pot-contents">
+                  <div className="bubble bubble-1"></div>
+                  <div className="bubble bubble-2"></div>
+                  <div className="bubble bubble-3"></div>
+                </div>
+              </div>
+              <div className="pot-handles"></div>
             </div>
           </div>
-          <p>Cooking up creative recipes with your ingredients...</p>
+          <h3 className="loading-title">Cooking up your recipes...</h3>
+          <div className="loading-steps">
+            <div className={`loading-step ${loadingStep === 0 ? 'active' : ''}`}>
+              <span className="step-icon">📋</span>
+              <span className="step-text">Analyzing ingredients</span>
+            </div>
+            <div className={`loading-step ${loadingStep === 1 ? 'active' : ''}`}>
+              <span className="step-icon">🧪</span>
+              <span className="step-text">Finding flavor combinations</span>
+            </div>
+            <div className={`loading-step ${loadingStep === 2 ? 'active' : ''}`}>
+              <span className="step-icon">👨‍🍳</span>
+              <span className="step-text">Creating custom recipes</span>
+            </div>
+          </div>
           <p className="loading-subtext">This usually takes 15-30 seconds</p>
         </div>
       )}
@@ -373,4 +411,3 @@ function AiRecipeGenerator() {
 }
 
 export default AiRecipeGenerator;
-              

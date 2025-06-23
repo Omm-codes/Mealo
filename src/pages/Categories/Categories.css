@@ -67,8 +67,7 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  height: auto; /* Changed from 100% to auto */
-  min-height: 400px; /* Added minimum height */
+  height: 100%;
 }
 
 .category-card:hover {
@@ -78,13 +77,13 @@
 
 .category-image-wrapper {
   width: 100%;
-  height: 160px;
+  height: 140px; /* Match cuisine card height */
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f9f9f9;
-  flex-shrink: 0; /* Prevent image from shrinking */
+  flex-shrink: 0;
 }
 
 .category-card img {
@@ -99,26 +98,29 @@
 }
 
 .category-content {
-  padding: 1.5rem;
+  padding: 1.2rem;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  justify-content: space-between; /* Better distribute content */
+  justify-content: space-between;
 }
 
 .category-card h3 {
-  margin: 0 0 1rem;
-  font-size: 1.3rem;
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
   color: #a0430a;
   font-family: 'Playfair Display', serif;
 }
 
 .category-description {
   color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
-  overflow-wrap: break-word; /* Handle long text */
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limit to 3 lines */
+  -webkit-box-orient: vertical;
 }
 
 .view-button {
@@ -198,7 +200,7 @@
   }
   
   .category-card {
-    min-height: 380px; /* Adjusted for smaller screens */
+    min-height: 260px; /* Adjusted for smaller screens */
   }
   
   .categories-header {
@@ -230,11 +232,11 @@
   }
   
   .category-card {
-    min-height: 350px; /* Adjusted for mobile */
+    min-height: 240px; /* Adjusted for mobile */
   }
   
   .category-image-wrapper {
-    height: 130px;
+    height: 120px; /* Match cuisine card mobile height */
   }
   
   .category-content {
