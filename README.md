@@ -1,78 +1,137 @@
-# My Food Journal
+# MEALO - Your Personal Recipe Platform
 
-A recipe discovery app that lets users search for, view, and save recipes.
+MEALO is a modern, feature-rich recipe platform that helps users discover, save, and create delicious meals from around the world. Combining traditional recipes with cutting-edge AI technology, MEALO makes cooking accessible and enjoyable for everyone.
 
-## Environment Variables
+![MEALO Screenshot](./screenshots/homepage.png)
 
-Create a `.env` file in the root directory with the following variables:
+## 🌟 Features
+
+- **Recipe Search & Discovery**: Browse thousands of recipes filtered by cuisine, ingredients, or dietary preferences
+- **AI Recipe Generator**: Create custom recipes based on ingredients you already have
+- **Meal Planner**: Plan your weekly meals with ease
+- **Nutrition Analysis**: Get detailed nutritional information for any recipe
+- **Favorites**: Save your favorite recipes to access them quickly
+- **Responsive Design**: Enjoy a seamless experience on desktop, tablet, and mobile devices
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v14.0.0 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/Omm-codes/mealo.git
+   cd mealo
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Create a `.env` file in the root directory with the following variables:
+   ```
+   REACT_APP_MEALDB_API_KEY=1
+   REACT_APP_SPOONACULAR_API_KEY=your_spoonacular_api_key
+   REACT_APP_SPOONACULAR_BASE_URL=https://api.spoonacular.com
+   REACT_APP_MEAL_DB_BASE_URL=https://www.themealdb.com/api/json/v1
+   REACT_APP_GROQ_API_KEY=your_groq_api_key_if_using
+   ```
+
+4. Start the development server:
+   ```
+   npm start
+   # or
+   yarn start
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) to view the app in your browser.
+
+## 📱 Key Features & Usage
+
+### Recipe Search
+Find recipes by name, ingredients, cuisine type, or dietary restrictions. The search functionality provides filters to narrow down results based on your preferences.
+
+### AI Recipe Generator
+Upload a list of ingredients you have on hand, and our AI will create custom recipes tailored to your available ingredients and preferences.
+
+### Meal Planning
+Create weekly meal plans, generate shopping lists, and organize your cooking schedule efficiently.
+
+### Nutrition Analysis
+View detailed nutritional information for any recipe, including calories, macronutrients, vitamins, and minerals.
+
+### Favorites System
+Save your favorite recipes for quick access later. The favorites are stored locally on your device.
+
+## 🔧 Technologies Used
+
+- **React**: Frontend library for building user interfaces
+- **React Router**: For navigation and routing
+- **CSS3**: For styling components
+- **TheMealDB API**: For recipe data
+- **Spoonacular API**: For advanced recipe search and nutrition information
+- **GROQ API**: For AI-powered recipe generation
+
+## 📁 Project Structure
 
 ```
-REACT_APP_API_BASE_URL=https://www.themealdb.com/api/json/v1/1
+mealo/
+├── public/
+│   ├── index.html
+│   ├── favicon.ico
+│   └── ...
+├── src/
+│   ├── components/
+│   │   ├── Header.js
+│   │   ├── Footer.js
+│   │   ├── RecipeCard.js
+│   │   ├── SearchBar.js
+│   │   ├── MealPlanner.js
+│   │   └── ...
+│   ├── pages/
+│   │   ├── Home.js
+│   │   ├── RecipeDetails.js
+│   │   ├── Favorites.js
+│   │   ├── MealPlannerPage.js
+│   │   └── ...
+│   ├── App.js
+│   ├── index.js
+│   └── ...
+├── .env
+├── package.json
+└── README.md
 ```
 
-## Available Scripts
+## 🤝 Contributing
 
-In the project directory, you can run:
+We welcome contributions to MEALO! To contribute, please follow these steps:
 
-### `npm start`
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/YourFeature`).
+3. Make your changes and commit them (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/YourFeature`).
+5. Open a pull request.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Please ensure your code follows the project's coding standards and includes appropriate tests.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📄 License
 
-### `npm test`
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📞 Contact
 
-### `npm run build`
+For inquiries or support, please contact:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Your Name - [your.email@example.com](mailto:omsanjay975@gmail.com)
+- GitHub: [YourGitHubProfile](https://github.com/Omm-codes)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Thank you for choosing MEALO as your personal recipe platform. Happy cooking!
