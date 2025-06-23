@@ -14,6 +14,7 @@ function MealDetail() {
   const [meal, setMeal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatedMeals, setRelatedMeals] = useState([]);
+  const [activeTab, setActiveTab] = useState('ingredients');
   
   useEffect(() => {
     const loadMealDetails = async () => {
@@ -76,6 +77,36 @@ function MealDetail() {
     navigate(-1);
   };
 
+  const renderIngredients = () => {
+    return (
+      <div className="ingredients-section">
+        <h3>Ingredients</h3>
+        <ul className="ingredients-list">
+          {ingredients.map((ing, index) => (
+            <li key={index} className="ingredient-item">
+              <span className="ingredient-measure">{ing.measure}</span>
+              <span className="ingredient-name">{ing.name}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+  
+  const renderInstructions = () => {
+    return (
+      <div className="instructions-section">
+        <h3>Preparation Steps</h3>
+        <div className="meal-instructions">
+          {meal.strInstructions.split('\r\n')
+            .filter(para => para.trim())
+            .map((para, idx) => <p key={idx}>{para}</p>)
+          }
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="skeleton-meal-detail">
@@ -118,6 +149,26 @@ function MealDetail() {
     cleanVideoId = videoId ? videoId.split('&')[0] : null;
   }
 
+  // Calculate approximate cooking time based on ingredients and complexity
+  const estimateCookingTime = () => {
+    if (meal.readyInMinutes) return meal.readyInMinutes;
+    
+    // Estimate based on ingredients count and instructions length
+    const baseTime = 15;
+    const ingredientsTime = ingredients.length * 2;
+    const instructionsTime = Math.ceil(meal.strInstructions.length / 500) * 5;
+    return baseTime + ingredientsTime + instructionsTime;
+  };
+  
+  const cookingTime = estimateCookingTime();
+  
+  // Determine difficulty based on ingredients and instructions
+  const determineDifficulty = () => {
+    if (ingredients.length > 12 || meal.strInstructions.length > 1500) return 'Advanced';
+    if (ingredients.length > 7 || meal.strInstructions.length > 800) return 'Intermediate';
+    return 'Easy';
+  };
+
   return (
     <div className="meal-detail">
       <button onClick={handleGoBack} className="back-button">
@@ -147,30 +198,45 @@ function MealDetail() {
         </div>
       </div>
       
-      <div className="meal-image-container">
-        <img src={meal.strMealThumb} alt={meal.strMeal} className="meal-image" />
-      </div>
-      
-      <div className="meal-content">
-        <div className="ingredients-section">
-          <h3>Ingredients</h3>
-          <ul className="ingredients-list">
-            {ingredients.map((ing, index) => (
-              <li key={index} className="ingredient-item">
-                <span className="ingredient-measure">{ing.measure}</span>
-                <span className="ingredient-name">{ing.name}</span>
-              </li>
-            ))}
-          </ul>
+      <div className="meal-overview">
+        <div className="meal-image-container">
+          <img src={meal.strMealThumb} alt={meal.strMeal} className="meal-image" />
+          <div className="meal-stats">
+            <div className="meal-stat">
+              <span className="stat-icon">⏱️</span>
+              <span className="stat-label">Time</span>
+              <span className="stat-value">{cookingTime} min</span>
+            </div>
+            <div className="meal-stat">
+              <span className="stat-icon">📝</span>
+              <span className="stat-label">Difficulty</span>
+              <span className="stat-value">{determineDifficulty()}</span>
+            </div>
+            <div className="meal-stat">
+              <span className="stat-icon">🍽️</span>
+              <span className="stat-label">Ingredients</span>
+              <span className="stat-value">{ingredients.length}</span>
+            </div>
+          </div>
         </div>
         
-        <div className="instructions-section">
-          <h3>Preparation Steps</h3>
-          <div className="meal-instructions">
-            {meal.strInstructions.split('\r\n')
-              .filter(para => para.trim())
-              .map((para, idx) => <p key={idx}>{para}</p>)
-            }
+        <div className="meal-content-tabs">
+          <div className="tabs-header">
+            <button 
+              className={`tab-button ${activeTab === 'ingredients' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('ingredients')}
+            >
+              Ingredients
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'instructions' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('instructions')}
+            >
+              Instructions
+            </button>
+          </div>
+          <div className="tab-content">
+            {activeTab === 'ingredients' ? renderIngredients() : renderInstructions()}
           </div>
         </div>
       </div>

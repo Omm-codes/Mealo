@@ -38,14 +38,33 @@ function Home() {
         // Get some trending recipes from Spoonacular
         const params = { 
           sort: "popularity", 
-          number: 3
+          number: 3,
+          addRecipeInformation: true
         };
         const meals = await advancedRecipeSearch(params);
-        setSpoonacularMeals(meals);
+        
+        // Check if we got valid meals back
+        if (meals && meals.length > 0) {
+          setSpoonacularMeals(meals);
+        } else {
+          console.warn("No valid meals returned from Spoonacular API");
+          // Fallback to random meals if Spoonacular fails
+          const fallbackMeals = [];
+          for (let i = 0; i < 3; i++) {
+            const meal = await fetchRandomMeal();
+            if (meal) {
+              fallbackMeals.push(meal);
+            }
+          }
+          setSpoonacularMeals(fallbackMeals);
+        }
       } catch (error) {
         console.error('Error fetching Spoonacular meals:', error);
+        // Set empty array to prevent endless loading
+        setSpoonacularMeals([]);
+      } finally {
+        setSpoonacularLoading(false);
       }
-      setSpoonacularLoading(false);
     };
 
     const loadCategories = async () => {
@@ -93,16 +112,20 @@ function Home() {
           <div className="meal-grid">
             <Skeleton type="meal-card" count={3} />
           </div>
-        ) : (
+        ) : spoonacularMeals.length > 0 ? (
           <div className="meal-grid">
             {spoonacularMeals.map(meal => (
               <MealCard key={meal.idMeal} meal={meal} />
             ))}
           </div>
+        ) : (
+          <div className="api-error-message">
+            <p>Unable to load trending recipes at this time.</p>
+          </div>
         )}
         <p className="api-attribution">Powered by Spoonacular</p>
       </section>
-
+      
       <section className="section featured-section">
         <div className="section-header">
           <h2 className="section-title">Featured Meals</h2>

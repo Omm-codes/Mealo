@@ -36,7 +36,7 @@ function Header() {
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         <Link to="/" className="logo">
-          <div className="logo-icon">🍽️</div>
+          <div className="logo-icon">🍛</div>
           <span className="logo-text">Mealo</span>
         </Link>
         

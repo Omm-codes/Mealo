@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import { searchMealsByName, fetchMealsByArea, fetchAreas, advancedRecipeSearch } from '../../services/api';
+import { searchMealsByName, fetchMealsByArea, fetchAreas, advancedRecipeSearch, fetchRandomMeal } from '../../services/api';
 import './Search.css';
 
 function Search() {
   const [query, setQuery] = useState('');
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [searched, setSearched] = useState(false);
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState('');
   const [activeTab, setActiveTab] = useState('basic');
   const [showAllAreas, setShowAllAreas] = useState(false);
+  const [popularMeals, setPopularMeals] = useState([]);
   
   // Advanced search options
   const [diet, setDiet] = useState('');
@@ -35,17 +37,47 @@ function Search() {
   ];
   
   useEffect(() => {
-    // Fetch available cuisines (areas)
-    const loadAreas = async () => {
+    // Fetch available cuisines (areas) and popular meals on initial load
+    const loadInitialData = async () => {
       try {
+        // Fetch areas
         const areasData = await fetchAreas();
         setAreas(areasData);
+        
+        // Fetch popular meals for initial display
+        const params = { 
+          sort: "popularity", 
+          number: 6,
+          addRecipeInformation: true
+        };
+        
+        try {
+          const popularRecipes = await advancedRecipeSearch(params);
+          if (popularRecipes && popularRecipes.length > 0) {
+            setPopularMeals(popularRecipes);
+          } else {
+            console.warn("No popular recipes returned from API");
+            // Fallback to random meals
+            const randomMeals = [];
+            for (let i = 0; i < 6; i++) {
+              const meal = await fetchRandomMeal();
+              if (meal) randomMeals.push(meal);
+              if (randomMeals.length >= 6) break;
+            }
+            setPopularMeals(randomMeals);
+          }
+        } catch (popularError) {
+          console.error('Error fetching popular meals:', popularError);
+          setPopularMeals([]);
+        }
       } catch (error) {
-        console.error('Error fetching cuisines:', error);
+        console.error('Error fetching initial data:', error);
+      } finally {
+        setInitialLoading(false);
       }
     };
     
-    loadAreas();
+    loadInitialData();
   }, []);
 
   const handleBasicSearch = async (e) => {
@@ -136,13 +168,13 @@ function Search() {
             className={`tab-button ${activeTab === 'basic' ? 'active' : ''}`}
             onClick={() => setActiveTab('basic')}
           >
-            <span className="tab-icon">🔍</span> Basic Search
+            <span className="tab-icon"></span> Basic Search
           </button>
           <button 
             className={`tab-button ${activeTab === 'advanced' ? 'active' : ''}`}
             onClick={() => setActiveTab('advanced')}
           >
-            <span className="tab-icon">⚙️</span> Advanced Search
+            <span className="tab-icon"></span> Advanced Search
           </button>
         </div>
         
@@ -151,7 +183,7 @@ function Search() {
             <>
               <form onSubmit={handleBasicSearch} className="search-form">
                 <div className="search-input-container">
-                  <span className="search-icon">🔍</span>
+                  <span className="search-icon"></span>
                   <input
                     type="text"
                     className="search-input"
@@ -201,7 +233,7 @@ function Search() {
               <div className="form-row">
                 <div className="form-group search-term-group">
                   <label htmlFor="query">
-                    <span className="input-icon">🔍</span> Recipe Name or Ingredients
+                    <span className="input-icon"></span> Recipe Name or Ingredients
                   </label>
                   <input
                     type="text"
@@ -328,11 +360,32 @@ function Search() {
                 Reset Search
               </button>
             </div>
-          ) : (
+          ) : searched ? (
             <div className="meal-grid">
               {meals.map(meal => (
                 <MealCard key={meal.idMeal} meal={meal} />
               ))}
+            </div>
+          ) : (
+            <div className="popular-recipes-section">
+              <h3 className="popular-recipes-title">Popular Recipes</h3>
+              <p className="popular-recipes-subtitle">Explore these trending recipes or search for something specific</p>
+              
+              {initialLoading ? (
+                <div className="meal-grid">
+                  <Skeleton type="meal-card" count={6} />
+                </div>
+              ) : popularMeals.length > 0 ? (
+                <div className="meal-grid">
+                  {popularMeals.map(meal => (
+                    <MealCard key={meal.idMeal} meal={meal} />
+                  ))}
+                </div>
+              ) : (
+                <div className="no-popular-recipes">
+                  <p>Unable to load popular recipes. Try searching for a specific recipe instead.</p>
+                </div>
+              )}
             </div>
           )}
         </div>

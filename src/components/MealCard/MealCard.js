@@ -1,16 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FavoriteButton from '../FavoriteButton/FavoriteButton';
 import './MealCard.css';
 
 function MealCard({ meal }) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   if (!meal) return null;
+  
+  // Make sure we have a valid image URL
+  const getOptimizedImageUrl = () => {
+    let imageUrl = meal.strMealThumb;
+    
+    if (!imageUrl || imageError) {
+      return 'https://via.placeholder.com/300x200?text=No+Image+Available';
+    }
+    
+    // For Spoonacular images, ensure we're using the higher quality version
+    if (meal.apiSource === 'spoonacular' && meal.idMeal) {
+      // Try to ensure we have a valid Spoonacular image URL
+      return `https://spoonacular.com/recipeImages/${meal.idMeal}-556x370.jpg`;
+    }
+    
+    return imageUrl;
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
 
   return (
     <div className="meal-card">
       <Link to={`/meal/${meal.idMeal}`} className="meal-card-image-link">
-        <div className="meal-card-image-container">
-          <img src={meal.strMealThumb} alt={meal.strMeal} className="meal-card-image" />
+        <div className={`meal-card-image-container ${!imageLoaded ? 'loading' : ''}`}>
+          {!imageLoaded && !imageError && <div className="image-placeholder-loader"></div>}
+          <img 
+            src={getOptimizedImageUrl()}
+            alt={meal.strMeal} 
+            className="meal-card-image" 
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+          />
           <div className="meal-card-overlay">
             <span className="view-recipe-text">View Recipe</span>
           </div>
@@ -40,7 +75,6 @@ function MealCard({ meal }) {
         <div className="meal-card-meta">
           {meal.strArea && <span className="meal-card-area">{meal.strArea} Cuisine</span>}
           
-          {/* Show dietary indicators if available */}
           <div className="dietary-indicators">
             {meal.vegetarian && <span className="dietary-tag vegetarian" title="Vegetarian">🌱</span>}
             {meal.vegan && <span className="dietary-tag vegan" title="Vegan">🌿</span>}

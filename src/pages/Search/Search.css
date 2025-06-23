@@ -7,11 +7,19 @@
   margin-bottom: 2rem;
 }
 
+.search-hero h2.page-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: #a0430a;
+  font-size: 2.2rem;
+}
+
 .search-subtitle {
   color: #666;
   font-size: 1.1rem;
   margin-top: -0.5rem;
   margin-bottom: 2rem;
+  font-family: 'Poppins', sans-serif;
 }
 
 .search-container {
@@ -142,6 +150,7 @@
   color: #555;
   margin-bottom: 1rem;
   font-weight: 500;
+  font-family: 'Playfair Display', serif;
 }
 
 .search-filters {
@@ -328,6 +337,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* Search results styling */
 .search-results {
   padding-top: 1rem;
+  margin-top: 2rem;
 }
 
 .search-results.loading {
@@ -360,6 +370,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: #555;
   font-size: 1.2rem;
   font-weight: 500;
+  font-family: 'Playfair Display', serif;
 }
 
 .no-results {
@@ -379,6 +390,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-size: 1.5rem;
   margin-bottom: 1rem;
   color: #333;
+  font-family: 'Playfair Display', serif;
 }
 
 .no-results p {
@@ -410,6 +422,41 @@ input[type="range"]::-webkit-slider-thumb:hover {
   margin-top: 3rem;
   color: #999;
   font-size: 0.85rem;
+}
+
+/* Popular recipes section styles */
+.popular-recipes-section {
+  margin-top: 2rem;
+}
+
+.popular-recipes-title {
+  font-size: 1.8rem;
+  color: #a0430a;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  position: relative;
+  display: inline-block;
+}
+
+.popular-recipes-title::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 3px;
+  background: #a0430a;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.popular-recipes-subtitle {
+  color: #666;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1rem;
 }
 
 /* Responsive styles */
@@ -447,6 +494,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
   
   .no-results {
     padding: 3rem 1.5rem;
+  }
+
+  .popular-recipes-title {
+    font-size: 1.5rem;
+  }
+  
+  .popular-recipes-subtitle {
+    font-size: 0.95rem;
   }
 }
 
@@ -492,5 +547,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
   
   .no-results-icon {
     font-size: 2.5rem;
+  }
+
+  .popular-recipes-title {
+    font-size: 1.3rem;
+  }
+  
+  .popular-recipes-subtitle {
+    font-size: 0.9rem;
   }
 }

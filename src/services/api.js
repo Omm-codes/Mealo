@@ -4,6 +4,34 @@ const SPOONACULAR_BASE_URL = process.env.REACT_APP_SPOONACULAR_BASE_URL;
 const MEAL_DB_BASE_URL = process.env.REACT_APP_MEAL_DB_BASE_URL;
 const GROQ_API_KEY = process.env.REACT_APP_GROQ_API_KEY;
 
+// Helper function to format recipe card data from Spoonacular
+const formatSpoonacularRecipeCard = (recipe) => {
+  // Make sure we have a valid recipe object
+  if (!recipe || !recipe.id) {
+    return null;
+  }
+  
+  const imageUrl = recipe.image 
+    ? (recipe.image.startsWith('http') 
+        ? recipe.image 
+        : `https://spoonacular.com/recipeImages/${recipe.id}-556x370.jpg`)
+    : 'https://via.placeholder.com/300x200?text=No+Image';
+    
+  return {
+    idMeal: recipe.id.toString(),
+    strMeal: recipe.title || 'Unnamed Recipe',
+    strMealThumb: imageUrl,
+    strCategory: recipe.dishTypes && recipe.dishTypes.length > 0 ? recipe.dishTypes[0] : '',
+    strArea: recipe.cuisines && recipe.cuisines.length > 0 ? recipe.cuisines[0] : '',
+    readyInMinutes: recipe.readyInMinutes || 0,
+    vegetarian: recipe.vegetarian || false,
+    vegan: recipe.vegan || false,
+    glutenFree: recipe.glutenFree || false,
+    dairyFree: recipe.dairyFree || false,
+    apiSource: 'spoonacular'
+  };
+};
+
 // Helper function to format meal data from Spoonacular to match our app's expected structure
 const formatSpoonacularMeal = (meal) => {
   return {
@@ -11,7 +39,7 @@ const formatSpoonacularMeal = (meal) => {
     strMeal: meal.title,
     strMealThumb: meal.image.startsWith('http') 
       ? meal.image 
-      : `https://spoonacular.com/recipeImages/${meal.image}`,
+      : `https://spoonacular.com/recipeImages/${meal.id}-556x370.jpg`, // Use higher resolution
     strCategory: meal.dishTypes && meal.dishTypes.length > 0 ? meal.dishTypes[0] : 'Main Course',
     strArea: meal.cuisines && meal.cuisines.length > 0 ? meal.cuisines[0] : 'International',
     strInstructions: meal.instructions || '',
@@ -31,25 +59,6 @@ const formatSpoonacularMeal = (meal) => {
       acc[`strMeasure${index}`] = `${ing.amount} ${ing.unit}`;
       return acc;
     }, {})
-  };
-};
-
-// Helper function to format recipe card data from Spoonacular
-const formatSpoonacularRecipeCard = (recipe) => {
-  return {
-    idMeal: recipe.id.toString(),
-    strMeal: recipe.title,
-    strMealThumb: recipe.image.startsWith('http') 
-      ? recipe.image 
-      : `https://spoonacular.com/recipeImages/${recipe.image}`,
-    strCategory: recipe.dishTypes && recipe.dishTypes.length > 0 ? recipe.dishTypes[0] : '',
-    strArea: recipe.cuisines && recipe.cuisines.length > 0 ? recipe.cuisines[0] : '',
-    readyInMinutes: recipe.readyInMinutes || 0,
-    vegetarian: recipe.vegetarian || false,
-    vegan: recipe.vegan || false,
-    glutenFree: recipe.glutenFree || false,
-    dairyFree: recipe.dairyFree || false,
-    apiSource: 'spoonacular'
   };
 };
 
@@ -170,12 +179,28 @@ export const advancedRecipeSearch = async (params) => {
     });
 
     const response = await fetch(`${SPOONACULAR_BASE_URL}/recipes/complexSearch?${queryParams}`);
+    if (!response.ok) {
+      throw new Error(`API responded with status: ${response.status}`);
+    }
     const data = await response.json();
     
-    return data.results ? data.results.map(recipe => formatSpoonacularRecipeCard(recipe)) : [];
+    // Add more detailed error checking
+    if (data.code && data.message) {
+      console.error("Spoonacular API error:", data.message);
+      return [];
+    }
+    
+    // Ensure we handle the results properly
+    if (!data.results || !Array.isArray(data.results)) {
+      console.error("Unexpected data format:", data);
+      return [];
+    }
+    
+    return data.results.map(recipe => formatSpoonacularRecipeCard(recipe));
   } catch (error) {
     console.error('Error performing advanced recipe search:', error);
-    throw error;
+    // Return empty array instead of throwing to avoid breaking the UI
+    return [];
   }
 };
 

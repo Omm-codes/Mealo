@@ -1,5 +1,5 @@
 .meal-detail {
-  max-width: 800px;
+  max-width: 850px;
   margin: 0 auto;
   background: #fff;
   padding: 2rem;
@@ -19,6 +19,7 @@
   font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
+  transition: color 0.3s ease;
 }
 
 .back-button:hover {
@@ -41,10 +42,11 @@
 }
 
 .meal-detail h2 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   margin: 0 0 0.75rem;
   color: #a0430a;
   line-height: 1.2;
+  font-family: 'Playfair Display', serif;
 }
 
 .meal-meta-tags {
@@ -72,15 +74,24 @@
   color: #2e7d32;
 }
 
-.meal-image-container {
+.meal-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
   margin-bottom: 2rem;
-  overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+@media (min-width: 768px) {
+  .meal-overview {
+    grid-template-columns: minmax(0, 1fr) 1.5fr;
+  }
+}
+
+.meal-image-container {
   position: relative;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .meal-image {
@@ -91,36 +102,87 @@
   max-height: 350px;
 }
 
-.meal-image-container:hover .meal-image {
-  transform: none;
+.meal-stats {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 1rem;
+  border-top: 1px solid #eee;
 }
 
-.meal-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 2rem;
-  margin-bottom: 2rem;
+.meal-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
 }
 
-@media (min-width: 768px) {
-  .meal-content {
-    grid-template-columns: minmax(0, 1fr) 2fr;
-  }
+.stat-icon {
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
 }
 
-.ingredients-section {
-  background: #f7f7f7;
-  padding: 1.5rem;
-  border-radius: 8px;
-  height: fit-content;
+.stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.2rem;
 }
 
-.ingredients-section h3 {
+.stat-value {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.meal-content-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs-header {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active {
+  color: #a0430a;
+  border-bottom-color: #a0430a;
+}
+
+.tab-button:hover:not(.active) {
+  color: #a0430a;
+  background: rgba(160, 67, 10, 0.05);
+}
+
+.tab-content {
+  flex: 1;
+  overflow: auto;
+}
+
+.ingredients-section, .instructions-section {
+  padding: 0.5rem;
+}
+
+.ingredients-section h3, .instructions-section h3 {
   margin-top: 0;
   margin-bottom: 1rem;
   color: #a0430a;
-  text-align: center;
   font-size: 1.25rem;
+  font-family: 'Playfair Display', serif;
 }
 
 .ingredients-list {
@@ -134,7 +196,7 @@
   align-items: center;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
-  background: white;
+  background: #f7f7f7;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
@@ -152,13 +214,6 @@
 
 .ingredient-name {
   font-size: 0.95rem;
-}
-
-.instructions-section h3 {
-  margin-top: 0;
-  color: #a0430a;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
 }
 
 .meal-instructions {
