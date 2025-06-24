@@ -520,7 +520,7 @@ function Search() {
             <>
               <div className="meal-grid">
                 {meals.map(meal => (
-                  <MealCard key={meal.idMeal} meal={meal} />
+                  <MealCard key={meal.idMeal ? meal.idMeal.toString() : meal.id.toString()} meal={meal} />
                 ))}
               </div>
               
@@ -554,7 +554,7 @@ function Search() {
               ) : popularMeals.length > 0 ? (
                 <div className="meal-grid">
                   {popularMeals.map(meal => (
-                    <MealCard key={meal.idMeal} meal={meal} />
+                    <MealCard key={meal.idMeal ? meal.idMeal.toString() : meal.id.toString()} meal={meal} />
                   ))}
                 </div>
               ) : (

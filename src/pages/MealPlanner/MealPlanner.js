@@ -227,7 +227,7 @@ function MealPlanner() {
               </div>
               <div className="meal-actions">
                 <Link 
-                  to={`/meal/${meal.id}`}
+                  to={`/meal/${meal.idMeal ? meal.idMeal : meal.id.toString()}`}
                   className="view-recipe-link"
                 >
                   <svg viewBox="0 0 24 24" width="16" height="16">
@@ -235,7 +235,7 @@ function MealPlanner() {
                   </svg>
                   View Recipe
                 </Link>
-                <FavoriteButton mealId={meal.id.toString()} small={true} />
+                <FavoriteButton mealId={meal.idMeal ? meal.idMeal : meal.id.toString()} small={true} />
               </div>
             </div>
           </div>

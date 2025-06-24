@@ -28,7 +28,7 @@ function PrintButton({ meal }) {
     }
     
     // Get instructions
-    let instructions = meal.strInstructions || '';
+    let instructions = meal.strInstructions || meal.instructions || '';
     
     // Split instructions by line breaks or handle as a single paragraph
     let instructionParagraphs = instructions.split('\r\n')

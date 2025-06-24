@@ -34,9 +34,16 @@ function MealCard({ meal }) {
     setImageLoaded(true);
   };
 
+  // Always use idMeal as string for navigation
+  const getMealId = () => {
+    if (meal.idMeal) return meal.idMeal.toString();
+    if (meal.id) return meal.id.toString();
+    return '';
+  };
+
   return (
     <div className="meal-card">
-      <Link to={`/meal/${meal.idMeal}`} className="meal-card-image-link">
+      <Link to={`/meal/${getMealId()}`} className="meal-card-image-link">
         <div className={`meal-card-image-container ${!imageLoaded ? 'loading' : ''}`}>
           {!imageLoaded && !imageError && <div className="image-placeholder-loader"></div>}
           <img 
@@ -63,12 +70,12 @@ function MealCard({ meal }) {
       <div className="meal-card-content">
         <div className="meal-card-header">
           <h3 className="meal-card-title" title={meal.strMeal}>
-            <Link to={`/meal/${meal.idMeal}`}>
+            <Link to={`/meal/${getMealId()}`}>
               {meal.strMeal}
             </Link>
           </h3>
           <div className="meal-card-favorite">
-            <FavoriteButton mealId={meal.idMeal} />
+            <FavoriteButton mealId={getMealId()} />
           </div>
         </div>
         
@@ -83,7 +90,7 @@ function MealCard({ meal }) {
           </div>
         </div>
         
-        <Link to={`/meal/${meal.idMeal}`} className="meal-card-button">
+        <Link to={`/meal/${getMealId()}`} className="meal-card-button">
           View Recipe
         </Link>
       </div>

@@ -65,7 +65,7 @@ function Favorites() {
       ) : (
         <div className="meal-grid">
           {favorites.map(meal => (
-            <MealCard key={meal.idMeal} meal={meal} />
+            <MealCard key={meal.idMeal ? meal.idMeal.toString() : meal.id.toString()} meal={meal} />
           ))}
         </div>
       )}

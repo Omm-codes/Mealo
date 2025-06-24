@@ -20,15 +20,17 @@ function MealDetail() {
     const loadMealDetails = async () => {
       try {
         const mealData = await fetchMealById(id);
-        
         if (mealData) {
           setMeal(mealData);
-          
           // Fetch related meals by category
           if (mealData.strCategory) {
             const categoryMeals = await fetchMealsByCategory(mealData.strCategory);
             // Filter out current meal and take 3 random meals
-            const filtered = categoryMeals.filter(m => m.idMeal !== id);
+            const filtered = categoryMeals.filter(m => {
+              // Always compare as string
+              const relatedId = m.idMeal ? m.idMeal.toString() : (m.id ? m.id.toString() : '');
+              return relatedId !== mealData.idMeal.toString();
+            });
             const randomRelated = filtered.sort(() => 0.5 - Math.random()).slice(0, 3);
             setRelatedMeals(randomRelated);
           }
@@ -47,7 +49,6 @@ function MealDetail() {
   // Extract ingredients and measurements
   const getIngredients = (meal) => {
     const ingredients = [];
-    
     // For Spoonacular data, ingredients might be in extendedIngredients array
     if (meal.extendedIngredients && Array.isArray(meal.extendedIngredients)) {
       meal.extendedIngredients.forEach(ing => {
@@ -61,7 +62,6 @@ function MealDetail() {
       for (let i = 1; i <= 20; i++) {
         const ingredient = meal[`strIngredient${i}`];
         const measure = meal[`strMeasure${i}`];
-        
         if (ingredient && ingredient.trim()) {
           ingredients.push({
             name: ingredient,
@@ -94,14 +94,24 @@ function MealDetail() {
   };
   
   const renderInstructions = () => {
+    // Use strInstructions (TheMealDB) or instructions (Spoonacular)
+    const instructionsText = meal.strInstructions || meal.instructions || '';
+    // Split by line breaks or periods for Spoonacular
+    let paragraphs = [];
+    if (instructionsText.includes('\r\n')) {
+      paragraphs = instructionsText.split('\r\n').filter(para => para.trim());
+    } else if (instructionsText.includes('\n')) {
+      paragraphs = instructionsText.split('\n').filter(para => para.trim());
+    } else if (instructionsText.includes('. ')) {
+      paragraphs = instructionsText.split('. ').map(s => s.trim()).filter(s => s).map(s => s.endsWith('.') ? s : s + '.');
+    } else {
+      paragraphs = [instructionsText];
+    }
     return (
       <div className="instructions-section">
         <h3>Preparation Steps</h3>
         <div className="meal-instructions">
-          {meal.strInstructions.split('\r\n')
-            .filter(para => para.trim())
-            .map((para, idx) => <p key={idx}>{para}</p>)
-          }
+          {paragraphs.map((para, idx) => <p key={idx}>{para}</p>)}
         </div>
       </div>
     );
@@ -153,21 +163,23 @@ function MealDetail() {
   const estimateCookingTime = () => {
     if (meal.readyInMinutes) return meal.readyInMinutes;
     
-    // Estimate based on ingredients count and instructions length
+    // Use correct instructions text
+    const instructionsText = meal.strInstructions || meal.instructions || '';
     const baseTime = 15;
     const ingredientsTime = ingredients.length * 2;
-    const instructionsTime = Math.ceil(meal.strInstructions.length / 500) * 5;
+    const instructionsTime = Math.ceil(instructionsText.length / 500) * 5;
     return baseTime + ingredientsTime + instructionsTime;
   };
   
-  const cookingTime = estimateCookingTime();
-  
   // Determine difficulty based on ingredients and instructions
   const determineDifficulty = () => {
-    if (ingredients.length > 12 || meal.strInstructions.length > 1500) return 'Advanced';
-    if (ingredients.length > 7 || meal.strInstructions.length > 800) return 'Intermediate';
+    const instructionsText = meal.strInstructions || meal.instructions || '';
+    if (ingredients.length > 12 || instructionsText.length > 1500) return 'Advanced';
+    if (ingredients.length > 7 || instructionsText.length > 800) return 'Intermediate';
     return 'Easy';
   };
+
+  const cookingTime = estimateCookingTime();
 
   return (
     <div className="meal-detail">
@@ -292,6 +304,7 @@ function MealDetail() {
     </div>
   );
 }
+
 
 export default MealDetail;
 

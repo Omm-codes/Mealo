@@ -18,7 +18,7 @@ const formatSpoonacularRecipeCard = (recipe) => {
     : 'https://via.placeholder.com/300x200?text=No+Image';
     
   return {
-    idMeal: recipe.id.toString(),
+    idMeal: recipe.id ? recipe.id.toString() : '', // Always string
     strMeal: recipe.title || 'Unnamed Recipe',
     strMealThumb: imageUrl,
     strCategory: recipe.dishTypes && recipe.dishTypes.length > 0 ? recipe.dishTypes[0] : '',
@@ -35,7 +35,7 @@ const formatSpoonacularRecipeCard = (recipe) => {
 // Helper function to format meal data from Spoonacular to match our app's expected structure
 const formatSpoonacularMeal = (meal) => {
   return {
-    idMeal: meal.id.toString(),
+    idMeal: meal.id ? meal.id.toString() : '', // Always string
     strMeal: meal.title,
     strMealThumb: meal.image.startsWith('http') 
       ? meal.image 
@@ -68,6 +68,7 @@ const formatSpoonacularMeal = (meal) => {
 const markMealDBMeal = (meal) => {
   return {
     ...meal,
+    idMeal: meal.idMeal ? meal.idMeal.toString() : '', // Always string
     apiSource: 'mealdb',
     hasNutritionData: false // TheMealDB meals don't have nutrition data
   };

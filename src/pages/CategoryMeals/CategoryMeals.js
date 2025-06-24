@@ -71,7 +71,7 @@ function CategoryMeals() {
         <>
           <div className="meal-grid">
             {meals.map(meal => (
-              <MealCard key={meal.idMeal} meal={meal} />
+              <MealCard key={meal.idMeal ? meal.idMeal.toString() : meal.id.toString()} meal={meal} />
             ))}
           </div>
           
