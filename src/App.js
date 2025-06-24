@@ -16,6 +16,9 @@ import MealPlanner from './pages/MealPlanner/MealPlanner';
 import About from './pages/About/About';
 import Contact from './pages/Contact/Contact';
 import PageNotFound from './pages/PageNotFound/PageNotFound';
+import { inject } from '@vercel/analytics';
+
+inject();
 
 function App() {
   return (
