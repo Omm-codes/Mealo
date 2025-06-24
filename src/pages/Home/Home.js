@@ -14,12 +14,28 @@ function Home() {
   const [cuisineLoading, setCuisineLoading] = useState(true);
 
   useEffect(() => {
+    // Check if cached data exists and is not older than 30 minutes
+    const cachedRandomMeals = localStorage.getItem('cachedRandomMeals');
+    const cachedTrendingMeals = localStorage.getItem('cachedTrendingMeals');
+    const cacheTime = localStorage.getItem('homePageCacheTime');
+    const currentTime = new Date().getTime();
+    const thirtyMinutes = 30 * 60 * 1000; // 30 minutes in milliseconds
+    
+    const shouldRefreshCache = !cacheTime || (currentTime - parseInt(cacheTime)) > thirtyMinutes;
+
     const loadRandomMeals = async () => {
+      if (!shouldRefreshCache && cachedRandomMeals) {
+        setRandomMeals(JSON.parse(cachedRandomMeals));
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
       try {
-        // Use TheMealDB for featured meals
         const meals = await fetchPopularMeals(3);
         setRandomMeals(meals);
+        // Cache the results
+        localStorage.setItem('cachedRandomMeals', JSON.stringify(meals));
       } catch (error) {
         console.error('Error fetching random meals:', error);
       }
@@ -27,11 +43,18 @@ function Home() {
     };
 
     const loadTrendingMeals = async () => {
+      if (!shouldRefreshCache && cachedTrendingMeals) {
+        setTrendingMeals(JSON.parse(cachedTrendingMeals));
+        setTrendingLoading(false);
+        return;
+      }
+      
       setTrendingLoading(true);
       try {
-        // Use TheMealDB for trending meals too - just get different random meals
         const meals = await fetchPopularMeals(3);
         setTrendingMeals(meals);
+        // Cache the results
+        localStorage.setItem('cachedTrendingMeals', JSON.stringify(meals));
       } catch (error) {
         console.error('Error fetching trending meals:', error);
         setTrendingMeals([]);
@@ -40,43 +63,31 @@ function Home() {
     };
 
     const loadCuisines = async () => {
+      // Cuisines don't change often, we can load them from the predefined array
       setCuisineLoading(true);
-      try {
-        const allCuisines = await fetchAreas();
-        
-        // Define our required cuisines - make sure these are exactly as returned by the API
-        const requiredCuisines = [
-          'American', 'Thai', 'Italian', 'French', 
-          'Spanish', 'Turkish', 'Chinese', 'Indian'
-        ];
-        
-        // Create cuisine objects directly instead of filtering from API results
-        // This ensures we always have our required cuisines in the right format
-        const displayCuisines = requiredCuisines.map(name => ({ strArea: name }));
-        
-        // Use exactly 8 cuisines, the ones we specified
-        setCuisines(displayCuisines);
-      } catch (error) {
-        console.error('Error fetching cuisines:', error);
-        // In case of error, still show our required cuisines
-        const fallbackCuisines = [
-          'American', 'Thai', 'Italian', 'French', 
-          'Spanish', 'Turkish', 'Chinese', 'Indian'
-        ].map(name => ({ strArea: name }));
-        setCuisines(fallbackCuisines);
-      }
+      
+      // Define our required cuisines
+      const requiredCuisines = [
+        'American', 'Thai', 'Italian', 'French', 
+        'Spanish', 'Turkish', 'Chinese', 'Indian'
+      ];
+      
+      // Create cuisine objects directly
+      const displayCuisines = requiredCuisines.map(name => ({ strArea: name }));
+      
+      setCuisines(displayCuisines);
       setCuisineLoading(false);
     };
 
-    // Load content progressively
+    // Load content
     loadRandomMeals();
-    
-    // Delay trending meals to reduce concurrent API calls
-    setTimeout(() => {
-      loadTrendingMeals();
-    }, 1000);
-    
+    loadTrendingMeals();
     loadCuisines();
+    
+    // Update cache timestamp
+    if (shouldRefreshCache) {
+      localStorage.setItem('homePageCacheTime', currentTime.toString());
+    }
   }, []);
 
   // Cuisine background images and descriptions
@@ -174,6 +185,7 @@ function Home() {
                 return (
                   <Link 
                     to="/search" 
+                    state={{ selectedCuisine: cuisine.strArea }}
                     onClick={() => {
                       localStorage.setItem('selectedCuisine', cuisine.strArea);
                     }} 
@@ -263,7 +275,7 @@ function Home() {
             </div>
           </Link>
           
-          <Link to="/nutrition/659315" className="tool-card nutrition-tool" aria-label="Nutrition Analysis Tool">
+          <Link to="/nutrition/716429" className="tool-card nutrition-tool" aria-label="Nutrition Analysis Tool">
             <div className="tool-card-bg"></div>
             <div className="tool-content">
               <div className="tool-icon">

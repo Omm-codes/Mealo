@@ -4,7 +4,7 @@ import FavoriteButton from '../../components/FavoriteButton/FavoriteButton';
 import PrintButton from '../../components/PrintButton/PrintButton';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import { fetchMealById, fetchMealsByCategory } from '../../services/api';
+import { fetchMealById, fetchMealsByCategory, hasNutritionData } from '../../services/api';
 
 import './MealDetail.css';
 
@@ -189,7 +189,7 @@ function MealDetail() {
         <div className="meal-actions">
           <PrintButton meal={meal} />
           <FavoriteButton mealId={meal.idMeal} />
-          {meal.idMeal && /^\d+$/.test(meal.idMeal) && (
+          {hasNutritionData(meal) && (
             <Link to={`/nutrition/${meal.idMeal}`} className="nutrition-button">
               <span className="nutrition-icon">📊</span>
               <span className="nutrition-text">Nutrition Facts</span>

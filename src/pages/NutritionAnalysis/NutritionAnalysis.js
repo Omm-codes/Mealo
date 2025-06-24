@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { fetchMealById, getNutritionInfo } from '../../services/api';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { fetchMealById, getNutritionInfo, hasNutritionData } from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import './NutritionAnalysis.css';
 
 function NutritionAnalysis() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [meal, setMeal] = useState(null);
   const [nutrition, setNutrition] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,6 +19,15 @@ function NutritionAnalysis() {
       try {
         // Fetch the meal data
         const mealData = await fetchMealById(id);
+        
+        // Check if nutrition data is available for this meal
+        if (!mealData || !hasNutritionData(mealData)) {
+          setError('Nutritional information is not available for this recipe.');
+          setMeal(mealData); // Still set the meal so we can display its name
+          setLoading(false);
+          return;
+        }
+        
         setMeal(mealData);
         
         // If meal already contains nutrition data
@@ -391,8 +401,11 @@ function NutritionAnalysis() {
             <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
           </svg>
           <p>{error}</p>
-          <Link to={`/meal/${id}`} className="back-to-recipe-btn">
-            Back to Recipe
+          {meal && (
+            <p>Unfortunately, detailed nutrition analysis is only available for certain recipes in our database.</p>
+          )}
+          <Link to={meal ? `/meal/${id}` : '/search'} className="back-to-recipe-btn">
+            {meal ? 'Back to Recipe' : 'Find Other Recipes'}
           </Link>
         </div>
       </div>

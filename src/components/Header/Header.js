@@ -101,19 +101,19 @@ function Header() {
                   to="/ai-recipe-generator" 
                   className={({isActive}) => isActive ? "active" : ""}
                 >
-                  <span className="dropdown-icon"></span>AI Recipe Generator
+                  <span className="dropdown-icon">🧪</span>AI Recipe Generator
                 </NavLink>
                 <NavLink 
                   to="/meal-planner" 
                   className={({isActive}) => isActive ? "active" : ""}
                 >
-                  <span className="dropdown-icon"></span>Meal Planner
+                  <span className="dropdown-icon">📅</span>Meal Planner
                 </NavLink>
                 <NavLink 
-                  to="/nutrition/659315" 
+                  to="/nutrition/716429" 
                   className={({isActive}) => isActive ? "active" : ""}
                 >
-                  <span className="dropdown-icon"></span>Nutrition Analysis
+                  <span className="dropdown-icon">📊</span>Nutrition Analysis
                 </NavLink>
               </div>
             </li>

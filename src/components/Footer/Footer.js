@@ -62,7 +62,7 @@ function Footer() {
           <ul>
             <li><Link to="/ai-recipe-generator">AI Recipe Generator</Link></li>
             <li><Link to="/meal-planner">Meal Planner</Link></li>
-            <li><Link to="/nutrition/659315">Nutrition Analysis</Link></li>
+            <li><Link to="/nutrition/716429">Nutrition Analysis</Link></li>
             <li><Link to="/categories">Browse Cuisines</Link></li>
           </ul>
         </div>

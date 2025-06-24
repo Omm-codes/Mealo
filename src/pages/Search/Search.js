@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import { searchMealsByName, fetchMealsByArea, fetchAreas, advancedRecipeSearch, fetchRandomMeal, fetchPopularMeals, searchMealsByNamePaginated, fetchMealsByCategoryPaginated } from '../../services/api';
 import './Search.css';
 
 function Search() {
+  const location = useLocation();
   const [query, setQuery] = useState('');
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -42,16 +44,64 @@ function Search() {
     { value: 'paleo', label: 'Paleo' }
   ];
   
+  // Track if we should trigger a cuisine search after mount
+  const [pendingCuisine, setPendingCuisine] = useState(null);
+  
   useEffect(() => {
+    // Check for selected cuisine from home page
+    const storedCuisine = localStorage.getItem('selectedCuisine');
+    const passedCuisine = location.state?.selectedCuisine;
+    
+    // If a cuisine was selected on home page, use it
+    if (passedCuisine || storedCuisine) {
+      const cuisineToUse = passedCuisine || storedCuisine;
+      setSelectedArea(cuisineToUse);
+      setCuisine(cuisineToUse); // Set cuisine for advanced search too
+      setPendingCuisine(cuisineToUse);
+      
+      // Clear the stored cuisine after using it
+      localStorage.removeItem('selectedCuisine');
+    }
+
     const loadInitialData = async () => {
       try {
-        const areasData = await fetchAreas();
-        setAreas(areasData);
+        // Check for cached areas (cuisines)
+        const cachedAreas = localStorage.getItem('cachedAreas');
+        const areasCacheTime = localStorage.getItem('areasCacheTime');
+        const currentTime = new Date().getTime();
+        const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours
         
-        // Use TheMealDB for popular meals
+        // Areas/cuisines don't change often, we can cache them for 24 hours
+        const shouldRefreshAreasCache = !areasCacheTime || (currentTime - parseInt(areasCacheTime)) > oneDayInMs;
+        
+        if (!shouldRefreshAreasCache && cachedAreas) {
+          setAreas(JSON.parse(cachedAreas));
+        } else {
+          const areasData = await fetchAreas();
+          setAreas(areasData);
+          // Cache areas data
+          localStorage.setItem('cachedAreas', JSON.stringify(areasData));
+          localStorage.setItem('areasCacheTime', currentTime.toString());
+        }
+        
+        // Check for cached popular meals
+        const cachedPopularMeals = localStorage.getItem('cachedPopularMeals');
+        const popularMealsCacheTime = localStorage.getItem('popularMealsCacheTime');
+        const oneHourInMs = 60 * 60 * 1000; // 1 hour
+        
+        const shouldRefreshPopularMealsCache = !popularMealsCacheTime || 
+          (currentTime - parseInt(popularMealsCacheTime)) > oneHourInMs;
+        
         try {
-          const popularRecipes = await fetchPopularMeals(6);
-          setPopularMeals(popularRecipes);
+          if (!shouldRefreshPopularMealsCache && cachedPopularMeals) {
+            setPopularMeals(JSON.parse(cachedPopularMeals));
+          } else {
+            const popularRecipes = await fetchPopularMeals(6);
+            setPopularMeals(popularRecipes);
+            // Cache the popular meals
+            localStorage.setItem('cachedPopularMeals', JSON.stringify(popularRecipes));
+            localStorage.setItem('popularMealsCacheTime', currentTime.toString());
+          }
         } catch (popularError) {
           console.error('Error fetching popular meals:', popularError);
           setPopularMeals([]);
@@ -64,10 +114,19 @@ function Search() {
     };
     
     loadInitialData();
-  }, []);
+  }, [location]);
+
+  // When selectedArea changes (from Home page), trigger search for that cuisine
+  useEffect(() => {
+    if (pendingCuisine && selectedArea === pendingCuisine) {
+      performAreaSearch(pendingCuisine);
+      setPendingCuisine(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedArea, pendingCuisine]);
 
   const handleBasicSearch = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!query.trim() && !selectedArea) return;
     
     setLoading(true);
@@ -93,18 +152,46 @@ function Search() {
     setLoading(false);
   };
 
+  // Extract search logic into a separate function for reuse
+  const performBasicSearch = async (searchQuery, searchArea) => {
+    if (!searchQuery.trim() && !searchArea) return;
+
+    setLoading(true);
+    setCurrentPage(0);
+    try {
+      let result;
+      if (searchQuery.trim()) {
+        result = await searchMealsByNamePaginated(searchQuery, 0, 12);
+        setMeals(result.meals);
+        setHasMore(result.hasMore);
+        setTotalCount(result.totalCount);
+      } else {
+        setMeals([]);
+        setHasMore(false);
+        setTotalCount(0);
+      }
+      setSearched(true);
+    } catch (error) {
+      console.error('Error searching meals:', error);
+      setMeals([]);
+      setHasMore(false);
+      setTotalCount(0);
+    }
+    setLoading(false);
+  };
+
   const handleAreaChange = (area) => {
     const newSelectedArea = area === selectedArea ? '' : area;
     setSelectedArea(newSelectedArea);
-    
+    setCuisine(newSelectedArea); // Ensure advanced search cuisine stays in sync
+
     // Automatically trigger search when an area is selected
     if (newSelectedArea) {
-      performBasicSearch(query, newSelectedArea);
+      // Use fetchMealsByArea for cuisine/area search instead of fetchMealsByCategoryPaginated
+      performAreaSearch(newSelectedArea);
     } else if (query.trim()) {
-      // If area is deselected but there's a query, search by query
       performBasicSearch(query, '');
     } else {
-      // If both are empty, reset to initial state
       setMeals([]);
       setSearched(false);
       setHasMore(false);
@@ -112,26 +199,18 @@ function Search() {
     }
   };
 
-  // Extract search logic into a separate function for reuse
-  const performBasicSearch = async (searchQuery, searchArea) => {
-    if (!searchQuery.trim() && !searchArea) return;
-    
+  // Use this for area/cuisine search (TheMealDB "area" not "category")
+  const performAreaSearch = async (area) => {
     setLoading(true);
     setCurrentPage(0);
     try {
-      let result;
-      if (searchQuery.trim()) {
-        result = await searchMealsByNamePaginated(searchQuery, 0, 12);
-      } else if (searchArea) {
-        result = await fetchMealsByCategoryPaginated(searchArea, 0, 12);
-      }
-      
-      setMeals(result.meals);
-      setHasMore(result.hasMore);
-      setTotalCount(result.totalCount);
+      const areaMeals = await fetchMealsByArea(area);
+      setMeals(areaMeals);
+      setHasMore(false);
+      setTotalCount(areaMeals.length);
       setSearched(true);
     } catch (error) {
-      console.error('Error searching meals:', error);
+      console.error('Error searching meals by area:', error);
       setMeals([]);
       setHasMore(false);
       setTotalCount(0);
@@ -496,4 +575,3 @@ function Search() {
 }
 
 export default Search;
-

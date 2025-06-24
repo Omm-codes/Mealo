@@ -46,6 +46,7 @@ const formatSpoonacularMeal = (meal) => {
     strYoutube: meal.sourceUrl || '',
     strSource: meal.sourceUrl,
     nutrition: meal.nutrition || null,
+    hasNutritionData: true, // Spoonacular meals always have nutrition data available
     vegetarian: meal.vegetarian || false,
     vegan: meal.vegan || false,
     glutenFree: meal.glutenFree || false,
@@ -53,6 +54,7 @@ const formatSpoonacularMeal = (meal) => {
     healthScore: meal.healthScore || 0,
     readyInMinutes: meal.readyInMinutes || 0,
     sourceName: meal.sourceName || '',
+    apiSource: 'spoonacular',
     ...meal.extendedIngredients?.reduce((acc, ing, i) => {
       const index = i + 1;
       acc[`strIngredient${index}`] = ing.name;
@@ -66,7 +68,8 @@ const formatSpoonacularMeal = (meal) => {
 const markMealDBMeal = (meal) => {
   return {
     ...meal,
-    apiSource: 'mealdb'
+    apiSource: 'mealdb',
+    hasNutritionData: false // TheMealDB meals don't have nutrition data
   };
 };
 
@@ -381,4 +384,41 @@ export const getMealPlanByDiet = async (diet, calories, timeFrame = 'day') => {
     console.error('Error generating meal plan:', error);
     throw error;
   }
+};
+
+// Helper function to check if a meal has nutrition data available
+export const hasNutritionData = (meal) => {
+  // Check if the meal is from Spoonacular (numeric ID) or has the hasNutritionData flag set to true
+  return (meal && (meal.hasNutritionData === true || (meal.idMeal && /^\d+$/.test(meal.idMeal))));
+};
+
+// Utility function to check if cached data is still valid
+export const isCacheValid = (cacheKey, expiryInMinutes = 30) => {
+  const cacheTimeKey = `${cacheKey}_time`;
+  const cachedTime = localStorage.getItem(cacheTimeKey);
+  
+  if (!cachedTime) return false;
+  
+  const currentTime = new Date().getTime();
+  const expiryTime = parseInt(cachedTime) + (expiryInMinutes * 60 * 1000);
+  
+  return currentTime < expiryTime;
+};
+
+// Get cached data if valid, otherwise fetch new data
+export const getCachedOrFetch = async (cacheKey, fetchFunction, expiryInMinutes = 30) => {
+  const cachedData = localStorage.getItem(cacheKey);
+  
+  if (cachedData && isCacheValid(cacheKey, expiryInMinutes)) {
+    return JSON.parse(cachedData);
+  }
+  
+  // Cache miss or expired, fetch new data
+  const freshData = await fetchFunction();
+  
+  // Cache the new data
+  localStorage.setItem(cacheKey, JSON.stringify(freshData));
+  localStorage.setItem(`${cacheKey}_time`, new Date().getTime().toString());
+  
+  return freshData;
 };
