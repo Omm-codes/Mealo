@@ -16,9 +16,8 @@ import MealPlanner from './pages/MealPlanner/MealPlanner';
 import About from './pages/About/About';
 import Contact from './pages/Contact/Contact';
 import PageNotFound from './pages/PageNotFound/PageNotFound';
-import { inject } from '@vercel/analytics';
+import { Analytics } from "@vercel/analytics/react"
 
-inject();
 
 function App() {
   return (
@@ -44,6 +43,7 @@ function App() {
         </main>
         <Footer />
       </div>
+      <Analytics />
     </Router>
   );
 }
