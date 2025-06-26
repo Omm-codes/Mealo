@@ -27,9 +27,12 @@ function MealDetail() {
             const categoryMeals = await fetchMealsByCategory(mealData.strCategory);
             // Filter out current meal and take 3 random meals
             const filtered = categoryMeals.filter(m => {
-              // Always compare as string
+              // Always compare as string and check both idMeal and id
               const relatedId = m.idMeal ? m.idMeal.toString() : (m.id ? m.id.toString() : '');
-              return relatedId !== mealData.idMeal.toString();
+              const currentId = mealData.apiSource === 'spoonacular'
+                ? (mealData.id ? mealData.id.toString() : '')
+                : (mealData.idMeal ? mealData.idMeal.toString() : '');
+              return relatedId !== currentId;
             });
             const randomRelated = filtered.sort(() => 0.5 - Math.random()).slice(0, 3);
             setRelatedMeals(randomRelated);

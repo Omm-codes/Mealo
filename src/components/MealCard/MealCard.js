@@ -34,8 +34,11 @@ function MealCard({ meal }) {
     setImageLoaded(true);
   };
 
-  // Always use idMeal as string for navigation
+  // Always use the correct ID for navigation based on API source
   const getMealId = () => {
+    if (meal.apiSource === 'spoonacular') {
+      return meal.id ? meal.id.toString() : '';
+    }
     if (meal.idMeal) return meal.idMeal.toString();
     if (meal.id) return meal.id.toString();
     return '';

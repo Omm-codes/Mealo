@@ -18,7 +18,8 @@ const formatSpoonacularRecipeCard = (recipe) => {
     : 'https://via.placeholder.com/300x200?text=No+Image';
     
   return {
-    idMeal: recipe.id ? recipe.id.toString() : '', // Always string
+    id: recipe.id ? recipe.id.toString() : '', // Always string for Spoonacular
+    idMeal: recipe.id ? recipe.id.toString() : '', // For compatibility
     strMeal: recipe.title || 'Unnamed Recipe',
     strMealThumb: imageUrl,
     strCategory: recipe.dishTypes && recipe.dishTypes.length > 0 ? recipe.dishTypes[0] : '',
@@ -35,7 +36,8 @@ const formatSpoonacularRecipeCard = (recipe) => {
 // Helper function to format meal data from Spoonacular to match our app's expected structure
 const formatSpoonacularMeal = (meal) => {
   return {
-    idMeal: meal.id ? meal.id.toString() : '', // Always string
+    id: meal.id ? meal.id.toString() : '', // Always string for Spoonacular
+    idMeal: meal.id ? meal.id.toString() : '', // For compatibility
     strMeal: meal.title,
     strMealThumb: meal.image.startsWith('http') 
       ? meal.image 
@@ -86,21 +88,22 @@ export const fetchRandomMeal = async () => {
   }
 };
 
-// Fetch meal by ID - Trying both APIs based on ID format
-export const fetchMealById = async (id) => {
+// Fetch meal by ID - Only use Spoonacular for advanced search, nutrition, and meal planner
+export const fetchMealById = async (id, options = {}) => {
   try {
-    // If id is numeric only (Spoonacular)
-    if (/^\d+$/.test(id)) {
+    // Only use Spoonacular if explicitly requested (for advanced search, nutrition, meal planner)
+    if (options.useSpoonacular) {
       try {
         const response = await fetch(`${SPOONACULAR_BASE_URL}/recipes/${id}/information?apiKey=${SPOONACULAR_API_KEY}&includeNutrition=true`);
         const data = await response.json();
         return formatSpoonacularMeal(data);
       } catch (spoonError) {
-        console.error('Spoonacular fetch failed, trying TheMealDB:', spoonError);
+        console.error('Spoonacular fetch failed:', spoonError);
+        return null;
       }
     }
 
-    // Try TheMealDB (fallback or if id is not numeric-only)
+    // Default: Use TheMealDB only
     const response = await fetch(`${MEAL_DB_BASE_URL}/lookup.php?i=${id}`);
     const data = await response.json();
     return data.meals ? markMealDBMeal(data.meals[0]) : null;
