@@ -76,7 +76,7 @@ function PrintButton({ meal }) {
             .join('')}
           <hr>
           <div class="footer">
-            Recipe from My Food Journal - Printed on ${new Date().toLocaleDateString()}
+            Recipe from MEALO - Printed on ${new Date().toLocaleDateString()}
           </div>
         </body>
       </html>
