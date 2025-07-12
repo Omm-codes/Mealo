@@ -19,7 +19,7 @@ function Home() {
     const cachedTrendingMeals = localStorage.getItem('cachedTrendingMeals');
     const cacheTime = localStorage.getItem('homePageCacheTime');
     const currentTime = new Date().getTime();
-    const thirtyMinutes = 30 * 60 * 1000; // 30 minutes in milliseconds
+    const thirtyMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
     
     const shouldRefreshCache = !cacheTime || (currentTime - parseInt(cacheTime)) > thirtyMinutes;
 
