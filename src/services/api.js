@@ -316,6 +316,14 @@ export const getNutritionInfo = async (id) => {
 // Get recipe suggestions based on ingredients - Using Groq
 export const getAIRecipeSuggestions = async (ingredients, preferences = '') => {
   try {
+    // Validate API key
+    if (!GROQ_API_KEY) {
+      console.error('GROQ API key is not configured');
+      throw new Error('AI service is not configured. Please check your API keys.');
+    }
+
+    console.log('Sending request to Groq API with ingredients:', ingredients);
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -323,46 +331,72 @@ export const getAIRecipeSuggestions = async (ingredients, preferences = '') => {
         'Authorization': `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful cooking assistant. Generate creative recipe ideas based on the ingredients provided. Format your response as a JSON array with 3 recipe objects. Each object should have: name, ingredients (array), instructions (array of steps), cookingTime (in minutes), and difficulty (Easy/Medium/Hard).'
+            content: 'You are a helpful cooking assistant. Generate creative recipe ideas based on the ingredients provided. You MUST respond with ONLY a valid JSON array containing exactly 3 recipe objects. Each object must have these fields: "name" (string), "ingredients" (array of strings), "instructions" (array of strings), "cookingTime" (number in minutes), and "difficulty" (string: "Easy", "Medium", or "Hard"). Do not include any text before or after the JSON array.'
           },
           {
             role: 'user',
-            content: `Generate 3 recipe ideas using some or all of these ingredients: ${ingredients}. ${preferences ? 'Preferences: ' + preferences : ''}`
+            content: `Generate 3 recipe ideas using some or all of these ingredients: ${ingredients}. ${preferences ? 'Additional preferences: ' + preferences : ''}`
           }
         ],
         temperature: 0.7,
-        max_tokens: 800
+        max_tokens: 2000
       })
     });
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Groq API error response:', errorText);
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
     const data = await response.json();
+    console.log('Groq API response:', data);
     
     if (data.error) {
-      throw new Error(data.error.message);
+      console.error('Groq API returned error:', data.error);
+      throw new Error(data.error.message || 'API returned an error');
+    }
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Unexpected API response structure:', data);
+      throw new Error('Invalid response from AI service');
     }
 
     // Parse the response content to extract the JSON
     const content = data.choices[0].message.content;
-    // Find JSON in the response
+    console.log('AI response content:', content);
+    
+    // Try to find and parse JSON in the response
     const jsonMatch = content.match(/\[[\s\S]*\]/);
     
     if (jsonMatch) {
       try {
-        return JSON.parse(jsonMatch[0]);
-      } catch (e) {
-        console.error('Failed to parse AI response JSON:', e);
-        return [];
+        const recipes = JSON.parse(jsonMatch[0]);
+        
+        // Validate the structure of recipes
+        if (Array.isArray(recipes) && recipes.length > 0) {
+          console.log('Successfully parsed recipes:', recipes);
+          return recipes;
+        } else {
+          console.error('Parsed JSON is not a valid array of recipes:', recipes);
+          throw new Error('Invalid recipe format returned');
+        }
+      } catch (parseError) {
+        console.error('Failed to parse AI response JSON:', parseError);
+        console.error('Content that failed to parse:', jsonMatch[0]);
+        throw new Error('Failed to parse recipe data from AI');
       }
+    } else {
+      console.error('No JSON array found in response:', content);
+      throw new Error('AI did not return recipe data in expected format');
     }
-    
-    return [];
   } catch (error) {
     console.error('Error getting AI recipe suggestions:', error);
-    return [];
+    throw error; // Re-throw to let the component handle it
   }
 };
 
@@ -425,4 +459,46 @@ export const getCachedOrFetch = async (cacheKey, fetchFunction, expiryInMinutes 
   localStorage.setItem(`${cacheKey}_time`, new Date().getTime().toString());
   
   return freshData;
+};
+
+// Test function to verify GROQ API key is working
+export const testGroqAPI = async () => {
+  try {
+    console.log('Testing GROQ API key...');
+    console.log('API Key exists:', !!GROQ_API_KEY);
+    console.log('API Key starts with gsk_:', GROQ_API_KEY?.startsWith('gsk_'));
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          {
+            role: 'user',
+            content: 'Say "API is working!" if you receive this message.'
+          }
+        ],
+        max_tokens: 50
+      })
+    });
+
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error:', errorText);
+      return { success: false, error: errorText };
+    }
+
+    const data = await response.json();
+    console.log('API Response:', data);
+    return { success: true, data };
+  } catch (error) {
+    console.error('Test failed:', error);
+    return { success: false, error: error.message };
+  }
 };
