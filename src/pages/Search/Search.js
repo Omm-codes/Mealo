@@ -22,7 +22,6 @@ function Search() {
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
   
   // Advanced search options
   const [diet, setDiet] = useState('');
@@ -141,13 +140,11 @@ function Search() {
       
       setMeals(result.meals);
       setHasMore(result.hasMore);
-      setTotalCount(result.totalCount);
       setSearched(true);
     } catch (error) {
       console.error('Error searching meals:', error);
       setMeals([]);
       setHasMore(false);
-      setTotalCount(0);
     }
     setLoading(false);
   };
@@ -164,18 +161,15 @@ function Search() {
         result = await searchMealsByNamePaginated(searchQuery, 0, 12);
         setMeals(result.meals);
         setHasMore(result.hasMore);
-        setTotalCount(result.totalCount);
       } else {
         setMeals([]);
         setHasMore(false);
-        setTotalCount(0);
       }
       setSearched(true);
     } catch (error) {
       console.error('Error searching meals:', error);
       setMeals([]);
       setHasMore(false);
-      setTotalCount(0);
     }
     setLoading(false);
   };
@@ -195,7 +189,6 @@ function Search() {
       setMeals([]);
       setSearched(false);
       setHasMore(false);
-      setTotalCount(0);
     }
   };
 
@@ -207,13 +200,11 @@ function Search() {
       const areaMeals = await fetchMealsByArea(area);
       setMeals(areaMeals);
       setHasMore(false);
-      setTotalCount(areaMeals.length);
       setSearched(true);
     } catch (error) {
       console.error('Error searching meals by area:', error);
       setMeals([]);
       setHasMore(false);
-      setTotalCount(0);
     }
     setLoading(false);
   };
@@ -266,13 +257,11 @@ function Search() {
       const mealsData = await advancedRecipeSearch(params);
       setMeals(mealsData);
       setHasMore(false); // Spoonacular handles its own pagination
-      setTotalCount(mealsData.length);
       setSearched(true);
     } catch (error) {
       console.error('Error performing advanced search:', error);
       setMeals([]);
       setHasMore(false);
-      setTotalCount(0);
     }
     setLoading(false);
   };
@@ -300,7 +289,6 @@ function Search() {
     setMaxReadyTime(60);
     setCurrentPage(0);
     setHasMore(false);
-    setTotalCount(0);
   };
 
   return (

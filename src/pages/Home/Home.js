@@ -7,16 +7,13 @@ import './Home.css';
 
 function Home() {
   const [randomMeals, setRandomMeals] = useState([]);
-  const [trendingMeals, setTrendingMeals] = useState([]);
   const [cuisines, setCuisines] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [trendingLoading, setTrendingLoading] = useState(true);
   const [cuisineLoading, setCuisineLoading] = useState(true);
 
   useEffect(() => {
     // Check if cached data exists and is not older than 30 minutes
     const cachedRandomMeals = localStorage.getItem('cachedRandomMeals');
-    const cachedTrendingMeals = localStorage.getItem('cachedTrendingMeals');
     const cacheTime = localStorage.getItem('homePageCacheTime');
     const currentTime = new Date().getTime();
     const thirtyMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -42,26 +39,6 @@ function Home() {
       setLoading(false);
     };
 
-    const loadTrendingMeals = async () => {
-      if (!shouldRefreshCache && cachedTrendingMeals) {
-        setTrendingMeals(JSON.parse(cachedTrendingMeals));
-        setTrendingLoading(false);
-        return;
-      }
-      
-      setTrendingLoading(true);
-      try {
-        const meals = await fetchPopularMeals(3);
-        setTrendingMeals(meals);
-        // Cache the results
-        localStorage.setItem('cachedTrendingMeals', JSON.stringify(meals));
-      } catch (error) {
-        console.error('Error fetching trending meals:', error);
-        setTrendingMeals([]);
-      }
-      setTrendingLoading(false);
-    };
-
     const loadCuisines = async () => {
       // Cuisines don't change often, we can load them from the predefined array
       setCuisineLoading(true);
@@ -81,7 +58,6 @@ function Home() {
 
     // Load content
     loadRandomMeals();
-    loadTrendingMeals();
     loadCuisines();
     
     // Update cache timestamp
