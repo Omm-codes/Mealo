@@ -4,7 +4,7 @@ MEALO is a modern, feature-rich recipe platform that helps users discover, save,
 
 ![MEALO Screenshot](./screenshots/homepage.jpg)
 
-## 🌟 Features
+## Features
 
 - **Recipe Search & Discovery**: Browse thousands of recipes filtered by cuisine, ingredients, or dietary preferences
 - **AI Recipe Generator**: Create custom recipes based on ingredients you already have
@@ -13,7 +13,7 @@ MEALO is a modern, feature-rich recipe platform that helps users discover, save,
 - **Favorites**: Save your favorite recipes to access them quickly
 - **Responsive Design**: Enjoy a seamless experience on desktop, tablet, and mobile devices
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -53,24 +53,29 @@ MEALO is a modern, feature-rich recipe platform that helps users discover, save,
 
 5. Open [http://localhost:3000](http://localhost:3000) to view the app in your browser.
 
-## 📱 Key Features & Usage
+## Key Features & Usage
 
 ### Recipe Search
+
 Find recipes by name, ingredients, cuisine type, or dietary restrictions. The search functionality provides filters to narrow down results based on your preferences.
 
 ### AI Recipe Generator
+
 Upload a list of ingredients you have on hand, and our AI will create custom recipes tailored to your available ingredients and preferences.
 
 ### Meal Planning
+
 Create weekly meal plans, generate shopping lists, and organize your cooking schedule efficiently.
 
 ### Nutrition Analysis
+
 View detailed nutritional information for any recipe, including calories, macronutrients, vitamins, and minerals.
 
 ### Favorites System
+
 Save your favorite recipes for quick access later. The favorites are stored locally on your device.
 
-## 🔧 Technologies Used
+## Technologies Used
 
 - **React**: Frontend library for building user interfaces
 - **React Router**: For navigation and routing
@@ -79,37 +84,37 @@ Save your favorite recipes for quick access later. The favorites are stored loca
 - **Spoonacular API**: For advanced recipe search and nutrition information
 - **GROQ API**: For AI-powered recipe generation
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 mealo/
-├── public/
-│   ├── index.html
-│   ├── favicon.ico
-│   └── ...
-├── src/
-│   ├── components/
-│   │   ├── Header.js
-│   │   ├── Footer.js
-│   │   ├── RecipeCard.js
-│   │   ├── SearchBar.js
-│   │   ├── MealPlanner.js
-│   │   └── ...
-│   ├── pages/
-│   │   ├── Home.js
-│   │   ├── RecipeDetails.js
-│   │   ├── Favorites.js
-│   │   ├── MealPlannerPage.js
-│   │   └── ...
-│   ├── App.js
-│   ├── index.js
-│   └── ...
-├── .env
-├── package.json
-└── README.md
+  public/
+    index.html
+    favicon.ico
+    ...
+  src/
+    components/
+      Header.js
+      Footer.js
+      RecipeCard.js
+      SearchBar.js
+      MealPlanner.js
+      ...
+    pages/
+      Home.js
+      RecipeDetails.js
+      Favorites.js
+      MealPlannerPage.js
+      ...
+    App.js
+    index.js
+    ...
+  .env
+  package.json
+  README.md
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions to MEALO! To contribute, please follow these steps:
 
@@ -121,16 +126,16 @@ We welcome contributions to MEALO! To contribute, please follow these steps:
 
 Please ensure your code follows the project's coding standards and includes appropriate tests.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Contact
+## Contact
 
 For inquiries or support, please contact:
 
-- Your Name - [your.email@example.com](mailto:omsanjay975@gmail.com)
-- GitHub: [YourGitHubProfile](https://github.com/Omm-codes)
+- Email: [omsanjay975@gmail.com](mailto:omsanjay975@gmail.com)
+- GitHub: [Omm-codes](https://github.com/Omm-codes)
 
 ---
 
