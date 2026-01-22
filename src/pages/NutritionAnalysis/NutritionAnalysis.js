@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { fetchMealById, getNutritionInfo, hasNutritionData } from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import './NutritionAnalysis.css';
 
 function NutritionAnalysis() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [meal, setMeal] = useState(null);
   const [nutrition, setNutrition] = useState(null);
   const [loading, setLoading] = useState(true);

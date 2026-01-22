@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import { fetchRandomMeal, advancedRecipeSearch, fetchAreas, fetchPopularMeals } from '../../services/api';
+import { fetchPopularMeals } from '../../services/api';
 import './Home.css';
 
 function Home() {

@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import FavoriteButton from '../../components/FavoriteButton/FavoriteButton';
 import PrintButton from '../../components/PrintButton/PrintButton';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import { fetchMealById, fetchMealsByCategory, hasNutritionData } from '../../services/api';
 
 import './MealDetail.css';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import { searchMealsByName, fetchMealsByArea, fetchAreas, advancedRecipeSearch, fetchRandomMeal, fetchPopularMeals, searchMealsByNamePaginated, fetchMealsByCategoryPaginated } from '../../services/api';
+import { fetchMealsByArea, fetchAreas, advancedRecipeSearch, fetchPopularMeals, searchMealsByNamePaginated, fetchMealsByCategoryPaginated } from '../../services/api';
 import './Search.css';
 
 function Search() {

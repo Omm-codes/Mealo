@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getAIRecipeSuggestions, fetchPopularMeals } from '../../services/api';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import './AiRecipeGenerator.css';
 
 function AiRecipeGenerator() {
