@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import { fetchPopularMeals, fetchRandomMeal, fetchCategories } from '../../services/api';
 import './Explore.css';
+
+// Predefined categories for better UX
+const defaultCategories = [
+  { id: 'Popular', name: 'Popular', icon: '🔥' },
+  { id: 'Random', name: 'Random', icon: '🎲' },
+  { id: 'Trending', name: 'Trending', icon: '⚡' },
+  { id: 'Quick', name: 'Quick & Easy', icon: '⏱️' }
+];
 
 function Explore() {
   const [recipes, setRecipes] = useState([]);
@@ -11,23 +19,7 @@ function Explore() {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState('Popular');
 
-  // Predefined categories for better UX
-  const defaultCategories = [
-    { id: 'Popular', name: 'Popular', icon: '🔥' },
-    { id: 'Random', name: 'Random', icon: '🎲' },
-    { id: 'Trending', name: 'Trending', icon: '⚡' },
-    { id: 'Quick', name: 'Quick & Easy', icon: '⏱️' }
-  ];
-
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  useEffect(() => {
-    loadRecipes(activeCategory);
-  }, [activeCategory]);
-
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const apiCategories = await fetchCategories();
       // Combine default categories with API categories (limited to 4 most popular)
@@ -41,7 +33,15 @@ function Explore() {
       console.error('Error loading categories:', error);
       setCategories(defaultCategories);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  useEffect(() => {
+    loadRecipes(activeCategory);
+  }, [activeCategory]);
 
   const loadRecipes = async (category) => {
     const cacheKey = `explore_${category}`;

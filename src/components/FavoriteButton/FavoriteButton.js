@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { addFavorite, removeFavorite, isFavorite as checkIsFavorite } from '../../services/firestore';
 import './FavoriteButton.css';
@@ -8,11 +8,7 @@ function FavoriteButton({ mealId, meal }) {
   const [loading, setLoading] = useState(false);
   const { currentUser } = useAuth();
   
-  useEffect(() => {
-    checkFavoriteStatus();
-  }, [mealId, currentUser]);
-  
-  const checkFavoriteStatus = async () => {
+  const checkFavoriteStatus = useCallback(async () => {
     if (currentUser) {
       // Check Firestore for logged-in users
       const favorite = await checkIsFavorite(currentUser.uid, mealId);
@@ -22,7 +18,11 @@ function FavoriteButton({ mealId, meal }) {
       const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
       setIsFavorite(favorites.some(fav => fav.idMeal === mealId || fav === mealId));
     }
-  };
+  }, [currentUser, mealId]);
+  
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, [checkFavoriteStatus]);
   
   const toggleFavorite = async (e) => {
     e.preventDefault(); // Prevent navigation if inside a link

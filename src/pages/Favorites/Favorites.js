@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getFavorites, removeFavorite } from '../../services/firestore';
@@ -11,11 +11,7 @@ function Favorites() {
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
 
-  useEffect(() => {
-    loadFavorites();
-  }, [currentUser]);
-
-  const loadFavorites = async () => {
+  const loadFavorites = useCallback(async () => {
     setLoading(true);
     
     if (currentUser) {
@@ -31,7 +27,11 @@ function Favorites() {
     }
     
     setLoading(false);
-  };
+  }, [currentUser]);
+
+  useEffect(() => {
+    loadFavorites();
+  }, [loadFavorites]);
 
   const clearAllFavorites = async () => {
     if (window.confirm('Are you sure you want to clear all your favorites?')) {
