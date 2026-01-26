@@ -202,7 +202,7 @@ function MealDetail() {
         </div>
         <div className="meal-actions">
           <PrintButton meal={meal} />
-          <FavoriteButton mealId={meal.idMeal} />
+          <FavoriteButton mealId={meal.idMeal} meal={meal} />
           {hasNutritionData(meal) && (
             <Link to={`/nutrition/${meal.idMeal}`} className="nutrition-button">
               <span className="nutrition-icon">📊</span>

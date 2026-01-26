@@ -78,7 +78,7 @@ function MealCard({ meal }) {
             </Link>
           </h3>
           <div className="meal-card-favorite">
-            <FavoriteButton mealId={getMealId()} />
+            <FavoriteButton mealId={getMealId()} meal={meal} />
           </div>
         </div>
         

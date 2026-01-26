@@ -80,7 +80,7 @@ function Footer() {
       
       <div className="footer-bottom">
         <p>&copy; {currentYear} Mealo. All rights reserved.</p>
-        <p className="footer-tagline">Made with 🍳 by Om Chavan❤, for food lovers</p>
+        <p className="footer-tagline">Made with ❤ by Om Chavan🍳, for food lovers</p>
       </div>
     </footer>
   );

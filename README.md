@@ -42,7 +42,17 @@ MEALO is a modern, feature-rich recipe platform that helps users discover, save,
    REACT_APP_SPOONACULAR_BASE_URL=https://api.spoonacular.com
    REACT_APP_MEAL_DB_BASE_URL=https://www.themealdb.com/api/json/v1
    REACT_APP_GROQ_API_KEY=your_groq_api_key_if_using
+   
+   # Firebase Configuration (for authentication and database)
+   REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+   REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
+   REACT_APP_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+   REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+   REACT_APP_FIREBASE_APP_ID=your_firebase_app_id
    ```
+   
+   **Note**: See [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) for detailed Firebase setup instructions.
 
 4. Start the development server:
    ```

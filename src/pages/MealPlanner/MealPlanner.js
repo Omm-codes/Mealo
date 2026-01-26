@@ -235,7 +235,7 @@ function MealPlanner() {
                   </svg>
                   View Recipe
                 </Link>
-                <FavoriteButton mealId={meal.idMeal ? meal.idMeal : meal.id.toString()} small={true} />
+                <FavoriteButton mealId={meal.idMeal ? meal.idMeal : meal.id.toString()} meal={meal} small={true} />
               </div>
             </div>
           </div>

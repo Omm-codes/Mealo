@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import './Header.css';
 // Import logo from assets directory
 import logo from '../../assets/logo.png'; // Update this path to match your actual logo file
@@ -8,12 +9,16 @@ function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
 
   // Close menu when route changes
   useEffect(() => {
     setMenuOpen(false);
     setDropdownOpen(false);
+    setUserDropdownOpen(false);
   }, [location.pathname]);
 
   // Add scroll event listener to add/remove header shadow
@@ -32,6 +37,19 @@ function Header() {
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
+  };
+
+  const toggleUserDropdown = () => {
+    setUserDropdownOpen(!userDropdownOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
   };
 
   return (
@@ -70,6 +88,14 @@ function Header() {
                 className={({isActive}) => isActive ? "active" : ""}
               >
                 Search
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink 
+                to="/explore" 
+                className={({isActive}) => isActive ? "active" : ""}
+              >
+                Explore
               </NavLink>
             </li>
             <li className="nav-item">
@@ -117,6 +143,33 @@ function Header() {
                 </NavLink>
               </div>
             </li>
+            {currentUser ? (
+              <li className={`nav-item dropdown user-dropdown ${userDropdownOpen ? 'open' : ''}`}>
+                <button 
+                  className="dropdown-title user-menu"
+                  onClick={toggleUserDropdown}
+                  aria-expanded={userDropdownOpen}
+                >
+                  <span className="user-icon">👤</span>
+                  {currentUser.displayName || 'User'}
+                  <span className="dropdown-arrow"></span>
+                </button>
+                <div className="dropdown-content">
+                  <button onClick={handleLogout} className="logout-btn">
+                    <span className="dropdown-icon">🚪</span>Logout
+                  </button>
+                </div>
+              </li>
+            ) : (
+              <li className="nav-item">
+                <NavLink 
+                  to="/login" 
+                  className={({isActive}) => isActive ? "active login-btn" : "login-btn"}
+                >
+                  Login
+                </NavLink>
+              </li>
+            )}
           </ul>
         </nav>
       </div>
