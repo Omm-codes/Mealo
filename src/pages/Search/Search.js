@@ -15,7 +15,6 @@ function Search() {
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState('');
   const [activeTab, setActiveTab] = useState('basic');
-  const [showAllAreas, setShowAllAreas] = useState(false);
   const [popularMeals, setPopularMeals] = useState([]);
   const [showRecentSearches, setShowRecentSearches] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
@@ -363,12 +362,6 @@ function Search() {
         : [...prev, intolerance]
     );
   };
-
-  const toggleAreaDisplay = () => {
-    setShowAllAreas(!showAllAreas);
-  };
-  
-  const displayedAreas = showAllAreas ? areas : areas.slice(0, 8);
   
   const resetFilters = () => {
     setQuery('');
