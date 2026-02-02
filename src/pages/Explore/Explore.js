@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
-import { fetchPopularMeals, fetchRandomMeal, fetchCategories, fetchAreas } from '../../services/api';
+import { fetchPopularMeals, fetchRandomMeal } from '../../services/api';
 import './Explore.css';
 
 // Main tabs for navigation
@@ -37,12 +37,11 @@ function Explore() {
   const [featuredRecipes, setFeaturedRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [featuredLoading, setFeaturedLoading] = useState(true);
-  const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState('Popular');
   const [activeFilters, setActiveFilters] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [displayedCount, setDisplayedCount] = useState(12);
-  const [hasMore, setHasMore] = useState(true);
+  const [, setHasMore] = useState(true);
   const navigate = useNavigate();
   const featuredScrollRef = useRef(null);
 
@@ -161,7 +160,7 @@ function Explore() {
 
 
   // Filter recipes based on active filters
-  const filteredRecipes = recipes.filter(meal => {
+  const filteredRecipes = recipes.filter(() => {
     if (activeFilters.length === 0) return true;
     // Add your filter logic here based on meal properties
     return true; // Simplified for now
