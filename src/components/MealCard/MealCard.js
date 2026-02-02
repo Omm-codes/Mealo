@@ -59,43 +59,41 @@ function MealCard({ meal }) {
           <div className="meal-card-overlay">
             <span className="view-recipe-text">View Recipe</span>
           </div>
-          {meal.strCategory && (
-            <div className="meal-card-category">{meal.strCategory}</div>
-          )}
           {meal.readyInMinutes && (
             <div className="meal-card-time">
               <span className="time-icon">⏱️</span> {meal.readyInMinutes} min
             </div>
           )}
+          <div className="meal-card-favorite-overlay">
+            <FavoriteButton mealId={getMealId()} meal={meal} />
+          </div>
         </div>
       </Link>
       
       <div className="meal-card-content">
-        <div className="meal-card-header">
-          <h3 className="meal-card-title" title={meal.strMeal}>
-            <Link to={`/meal/${getMealId()}`}>
-              {meal.strMeal}
-            </Link>
-          </h3>
-          <div className="meal-card-favorite">
-            <FavoriteButton mealId={getMealId()} meal={meal} />
-          </div>
-        </div>
+        <h3 className="meal-card-title" title={meal.strMeal}>
+          <Link to={`/meal/${getMealId()}`}>
+            {meal.strMeal}
+          </Link>
+        </h3>
         
-        <div className="meal-card-meta">
-          {meal.strArea && <span className="meal-card-area">{meal.strArea} Cuisine</span>}
-          
-          <div className="dietary-indicators">
-            {meal.vegetarian && <span className="dietary-tag vegetarian" title="Vegetarian">🌱</span>}
-            {meal.vegan && <span className="dietary-tag vegan" title="Vegan">🌿</span>}
-            {meal.glutenFree && <span className="dietary-tag gluten-free" title="Gluten Free">🌾</span>}
-            {meal.dairyFree && <span className="dietary-tag dairy-free" title="Dairy Free">🥛</span>}
-          </div>
+        <div className="meal-card-tags">
+          {meal.strCategory && (
+            <span className="meal-tag category-tag">{meal.strCategory}</span>
+          )}
+          {meal.strArea && (
+            <span className="meal-tag cuisine-tag">{meal.strArea}</span>
+          )}
+          {meal.vegetarian && (
+            <span className="meal-tag dietary-tag">🌱 Vegetarian</span>
+          )}
+          {meal.vegan && (
+            <span className="meal-tag dietary-tag">🌿 Vegan</span>
+          )}
+          {meal.glutenFree && (
+            <span className="meal-tag dietary-tag">Gluten Free</span>
+          )}
         </div>
-        
-        <Link to={`/meal/${getMealId()}`} className="meal-card-button">
-          View Recipe
-        </Link>
       </div>
     </div>
   );

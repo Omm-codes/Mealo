@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import MealCard from '../../components/MealCard/MealCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
@@ -17,6 +17,12 @@ function Search() {
   const [activeTab, setActiveTab] = useState('basic');
   const [showAllAreas, setShowAllAreas] = useState(false);
   const [popularMeals, setPopularMeals] = useState([]);
+  const [showRecentSearches, setShowRecentSearches] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [showCuisinesDropdown, setShowCuisinesDropdown] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
+  const searchFormRef = useRef(null);
+  const recentSearchesRef = useRef(null);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
@@ -42,9 +48,45 @@ function Search() {
     { value: 'ketogenic', label: 'Ketogenic' },
     { value: 'paleo', label: 'Paleo' }
   ];
+
+  // Top cuisines to display as chips
+  const topCuisines = ['Indian', 'Italian', 'Chinese', 'Thai', 'Mexican', 'Japanese', 'American', 'French'];
   
   // Track if we should trigger a cuisine search after mount
   const [pendingCuisine, setPendingCuisine] = useState(null);
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('recentSearches');
+    if (saved) {
+      setRecentSearches(JSON.parse(saved));
+    }
+  }, []);
+
+  // Handle scroll for sticky bar
+  useEffect(() => {
+    const handleScroll = () => {
+      if (searchFormRef.current) {
+        const rect = searchFormRef.current.getBoundingClientRect();
+        setIsSticky(rect.top <= 0);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close recent searches dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (recentSearchesRef.current && !recentSearchesRef.current.contains(event.target)) {
+        setShowRecentSearches(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   
   useEffect(() => {
     // Check for selected cuisine from home page
@@ -128,8 +170,14 @@ function Search() {
     if (e) e.preventDefault();
     if (!query.trim() && !selectedArea) return;
     
+    // Save to recent searches
+    if (query.trim()) {
+      saveRecentSearch(query.trim());
+    }
+    
     setLoading(true);
     setCurrentPage(0);
+    setShowRecentSearches(false);
     try {
       let result;
       if (query.trim()) {
@@ -147,6 +195,48 @@ function Search() {
       setHasMore(false);
     }
     setLoading(false);
+  };
+
+  const saveRecentSearch = (searchTerm) => {
+    const updated = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('recentSearches', JSON.stringify(updated));
+  };
+
+  const handleRecentSearchClick = (searchTerm) => {
+    setQuery(searchTerm);
+    setShowRecentSearches(false);
+    // Trigger search
+    setTimeout(() => {
+      const form = document.querySelector('.search-form');
+      if (form) {
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }, 100);
+  };
+
+  const clearAllRecentSearches = () => {
+    setRecentSearches([]);
+    localStorage.removeItem('recentSearches');
+    setShowRecentSearches(false);
+  };
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
+    if (e.target.value.trim() && recentSearches.length > 0) {
+      setShowRecentSearches(true);
+    }
+  };
+
+  const handleInputFocus = () => {
+    if (recentSearches.length > 0 && !query.trim()) {
+      setShowRecentSearches(true);
+    }
+  };
+
+  const clearSearchInput = () => {
+    setQuery('');
+    setShowRecentSearches(false);
   };
 
   // Extract search logic into a separate function for reuse
@@ -296,7 +386,7 @@ function Search() {
       <div className="search-hero">
         <h2 className="page-title">Find Your Perfect Recipe</h2>
         <p className="search-subtitle">
-          Search from thousands of recipes or filter by cuisine, diet, and more
+          Search from thousands of recipes
         </p>
       </div>
       
@@ -319,25 +409,53 @@ function Search() {
         <div className="search-panel">
           {activeTab === 'basic' ? (
             <>
-              <form onSubmit={handleBasicSearch} className="search-form">
-                <div className="search-input-container">
-                  <span className="search-icon"></span>
+              <form onSubmit={handleBasicSearch} className="search-form" ref={searchFormRef}>
+                <div className="search-input-container" ref={recentSearchesRef}>
+                  <span className="search-icon">🔍</span>
                   <input
                     type="text"
                     className="search-input"
                     placeholder="Search for a meal or ingredient..."
                     value={query}
-                    onChange={e => setQuery(e.target.value)}
+                    onChange={handleInputChange}
+                    onFocus={handleInputFocus}
                   />
-                  {(query || selectedArea) && (
+                  {query && (
                     <button 
                       type="button" 
                       className="clear-search" 
-                      onClick={resetFilters}
+                      onClick={clearSearchInput}
                       aria-label="Clear search"
                     >
                       ×
                     </button>
+                  )}
+                  {showRecentSearches && recentSearches.length > 0 && (
+                    <div className="recent-searches-dropdown">
+                      <div className="recent-searches-header">
+                        <span>Recent searches</span>
+                        <button 
+                          type="button" 
+                          className="clear-all-recent"
+                          onClick={clearAllRecentSearches}
+                        >
+                          Clear all
+                        </button>
+                      </div>
+                      <div className="recent-searches-list">
+                        {recentSearches.map((search, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className="recent-search-item"
+                            onClick={() => handleRecentSearchClick(search)}
+                          >
+                            <span className="recent-search-icon">🕐</span>
+                            {search}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
                 <button 
@@ -350,9 +468,9 @@ function Search() {
               </form>
 
               <div className="search-options">
-                <h3 className="filters-title">Filter by cuisine:</h3>
+                <h3 className="filters-title">Popular cuisines:</h3>
                 <div className="search-filters">
-                  {displayedAreas.map((area, index) => (
+                  {areas.filter(area => topCuisines.includes(area.strArea)).map((area, index) => (
                     <button
                       key={index}
                       className={`filter-button ${selectedArea === area.strArea ? 'active' : ''}`}
@@ -361,14 +479,30 @@ function Search() {
                       {area.strArea}
                     </button>
                   ))}
-                  {areas.length > 8 && (
+                  <div className="more-cuisines-dropdown">
                     <button 
-                      className="show-more-button"
-                      onClick={toggleAreaDisplay}
+                      className="filter-button more-cuisines-btn"
+                      onClick={() => setShowCuisinesDropdown(!showCuisinesDropdown)}
                     >
-                      {showAllAreas ? 'Show Less' : 'Show More'}
+                      More cuisines ▾
                     </button>
-                  )}
+                    {showCuisinesDropdown && (
+                      <div className="cuisines-dropdown-menu">
+                        {areas.filter(area => !topCuisines.includes(area.strArea)).map((area, index) => (
+                          <button
+                            key={index}
+                            className={`cuisine-dropdown-item ${selectedArea === area.strArea ? 'active' : ''}`}
+                            onClick={() => {
+                              handleAreaChange(area.strArea);
+                              setShowCuisinesDropdown(false);
+                            }}
+                          >
+                            {area.strArea}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </>
@@ -473,6 +607,53 @@ function Search() {
         </div>
       </div>
 
+      {/* Sticky Mini Search Bar */}
+      {isSticky && searched && (
+        <div className="sticky-search-bar">
+          <div className="sticky-search-content">
+            <form onSubmit={handleBasicSearch} className="sticky-search-form">
+              <div className="sticky-search-input-container">
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  className="sticky-search-input"
+                  placeholder="Search..."
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                />
+                {query && (
+                  <button 
+                    type="button" 
+                    className="clear-search" 
+                    onClick={clearSearchInput}
+                    aria-label="Clear"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              <button type="submit" className="sticky-search-button">
+                Search
+              </button>
+            </form>
+            <div className="sticky-filters">
+              {topCuisines.slice(0, 4).map((cuisineName) => {
+                const area = areas.find(a => a.strArea === cuisineName);
+                return area ? (
+                  <button
+                    key={cuisineName}
+                    className={`sticky-filter-chip ${selectedArea === area.strArea ? 'active' : ''}`}
+                    onClick={() => handleAreaChange(area.strArea)}
+                  >
+                    {area.strArea}
+                  </button>
+                ) : null;
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="search-results loading">
           <div className="loading-message">
@@ -485,13 +666,11 @@ function Search() {
         </div>
       ) : (
         <div className="search-results">
-          {!loading && searched && (
+          {!loading && searched && meals.length > 0 && (
             <div className="results-header">
-              {meals.length === 0 ? (
-                <h3>No recipes found</h3>
-              ) : (
-                <h3>Found {meals.length} recipe{meals.length !== 1 ? 's' : ''}</h3>
-              )}
+              <h3>
+                <span className="results-count">{meals.length}</span> recipe{meals.length !== 1 ? 's' : ''} found
+              </h3>
             </div>
           )}
           

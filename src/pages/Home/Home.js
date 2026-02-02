@@ -10,6 +10,8 @@ function Home() {
   const [cuisines, setCuisines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cuisineLoading, setCuisineLoading] = useState(true);
+  const [activeCuisineTab, setActiveCuisineTab] = useState('Popular');
+  const [activeView, setActiveView] = useState('cuisines'); // 'cuisines' or 'meals'
 
   useEffect(() => {
     // Check if cached data exists and is not older than 30 minutes
@@ -69,57 +71,128 @@ function Home() {
   // Cuisine background images and descriptions
   const cuisineDetails = {
     'Italian': {
-      image: 'https://images.unsplash.com/photo-1498579150354-977475b7ea0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Pasta, pizza, and Mediterranean flavors'
+      image: 'https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=500&h=300&fit=crop',
+      description: 'Pasta, pizza, and Mediterranean flavors',
+      recipeCount: '250+ recipes',
+      spiceLevel: 'Mild',
+      cookTime: '30-45 min',
+      category: 'European'
     },
     'Mexican': {
-      image: 'https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Bold spices, corn, and vibrant ingredients'
+      image: 'https://images.unsplash.com/photo-1613514785940-daed07799d9b?w=500&h=300&fit=crop',
+      description: 'Bold spices, corn, and vibrant ingredients',
+      recipeCount: '180+ recipes',
+      spiceLevel: 'Medium-Hot',
+      cookTime: '25-40 min',
+      category: 'Popular'
     },
     'Indian': {
-      image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Curry, spices, and aromatic dishes'
+      image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&h=300&fit=crop',
+      description: 'Rich curries, aromatic spices, and vibrant flavors',
+      recipeCount: '320+ recipes',
+      spiceLevel: 'Medium-Hot',
+      cookTime: '35-50 min',
+      category: 'Indian',
+      featured: true
     },
     'Chinese': {
-      image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Stir-fries, dumplings, and balanced flavors'
+      image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=500&h=300&fit=crop',
+      description: 'Stir-fries, dumplings, and balanced flavors',
+      recipeCount: '200+ recipes',
+      spiceLevel: 'Mild-Medium',
+      cookTime: '20-35 min',
+      category: 'Asian'
     },
     'Japanese': {
-      image: 'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Sushi, ramen, and precise techniques'
+      image: 'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?w=500&h=300&fit=crop',
+      description: 'Sushi, ramen, and precise techniques',
+      recipeCount: '150+ recipes',
+      spiceLevel: 'Mild',
+      cookTime: '25-40 min',
+      category: 'Asian'
     },
     'Thai': {
-      image: 'https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Sweet, sour, and spicy harmony'
+      image: 'https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=500&h=300&fit=crop',
+      description: 'Sweet, sour, and spicy harmony',
+      recipeCount: '170+ recipes',
+      spiceLevel: 'Medium-Hot',
+      cookTime: '25-35 min',
+      category: 'Asian'
     },
     'French': {
-      image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Elegant cooking with rich sauces'
+      image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop',
+      description: 'Elegant cooking with rich sauces',
+      recipeCount: '140+ recipes',
+      spiceLevel: 'Mild',
+      cookTime: '40-60 min',
+      category: 'European'
     },
     'Spanish': {
-      image: 'https://images.unsplash.com/photo-1515443961218-a51367888e4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Paella, tapas, and fresh ingredients'
+      image: 'https://images.unsplash.com/photo-1515443961218-a51367888e4b?w=500&h=300&fit=crop',
+      description: 'Paella, tapas, and fresh ingredients',
+      recipeCount: '130+ recipes',
+      spiceLevel: 'Mild',
+      cookTime: '30-45 min',
+      category: 'European'
+    },
+    'Turkish': {
+      image: 'https://images.unsplash.com/photo-1551248429-40975aa4de74?w=500&h=300&fit=crop',
+      description: 'Kebabs, mezze, and rich traditions',
+      recipeCount: '110+ recipes',
+      spiceLevel: 'Mild-Medium',
+      cookTime: '30-45 min',
+      category: 'European'
     },
     'Greek': {
-      image: 'https://images.unsplash.com/photo-1558005530-a7958896ec60?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Olives, feta, and Mediterranean herbs'
+      image: 'https://images.unsplash.com/photo-1558005530-a7958896ec60?w=500&h=300&fit=crop',
+      description: 'Olives, feta, and Mediterranean herbs',
+      recipeCount: '120+ recipes',
+      spiceLevel: 'Mild',
+      cookTime: '25-40 min',
+      category: 'European'
     },
     'American': {
-      image: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Burgers, comfort food, and diversity'
+      image: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=500&h=300&fit=crop',
+      description: 'Burgers, comfort food, and diversity',
+      recipeCount: '280+ recipes',
+      spiceLevel: 'Mild',
+      cookTime: '20-35 min',
+      category: 'Popular'
     },
     'British': {
-      image: 'https://images.unsplash.com/photo-1611973617655-38161a7644fc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Hearty classics and traditional dishes'
+      image: 'https://images.unsplash.com/photo-1611973617655-38161a7644fc?w=500&h=300&fit=crop',
+      description: 'Hearty classics and traditional dishes',
+      recipeCount: '90+ recipes',
+      spiceLevel: 'Mild',
+      cookTime: '35-50 min',
+      category: 'European'
     },
   };
   
   // Get cuisine details or use defaults
   const getCuisineDetails = (cuisine) => {
     return cuisineDetails[cuisine] || {
-      image: 'https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-      description: 'Explore traditional dishes and flavors'
+      image: 'https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?w=500&h=300&fit=crop',
+      description: 'Explore traditional dishes and flavors',
+      recipeCount: '50+ recipes',
+      spiceLevel: 'Mild',
+      cookTime: '30-45 min',
+      category: 'Popular'
     };
+  };
+
+  // Filter cuisines by category
+  const getFilteredCuisines = () => {
+    if (activeCuisineTab === 'Popular') {
+      return cuisines.filter(c => ['American', 'Mexican', 'Italian', 'Indian'].includes(c.strArea));
+    }
+    if (activeCuisineTab === 'Indian') {
+      return cuisines.filter(c => c.strArea === 'Indian');
+    }
+    return cuisines.filter(c => {
+      const details = getCuisineDetails(c.strArea);
+      return details.category === activeCuisineTab;
+    });
   };
 
   return (
@@ -143,84 +216,166 @@ function Home() {
         </div>
       </section>
 
-      <section className="section cuisines-section">
+      <section className="section cuisines-section merged-discovery-section">
         <div className="section-header">
-          <h2 className="section-title">Explore World Cuisines</h2>
-          <p className="section-subtitle">Discover amazing dishes from around the globe</p>
+          <h2 className="section-title">Discover Your Next Meal</h2>
+          <p className="section-subtitle">Explore by cuisine or browse our featured dishes</p>
         </div>
         
-        {cuisineLoading ? (
-          <div className="cuisines-grid">
-            <Skeleton type="cuisine-card" count={window.innerWidth <= 480 ? 3 : 6} />
-          </div>
-        ) : (
+        {/* View Toggle Buttons */}
+        <div className="view-toggle">
+          <button 
+            className={`view-toggle-btn ${activeView === 'cuisines' ? 'active' : ''}`}
+            onClick={() => setActiveView('cuisines')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+            </svg>
+            Browse by Cuisine
+          </button>
+          <button 
+            className={`view-toggle-btn ${activeView === 'meals' ? 'active' : ''}`}
+            onClick={() => setActiveView('meals')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Featured Dishes
+          </button>
+        </div>
+        
+        {/* Cuisines View */}
+        {activeView === 'cuisines' && (
           <>
-            <div className="cuisines-grid">
-              {cuisines.map((cuisine, index) => {
-                const cuisineDetails = getCuisineDetails(cuisine.strArea);
-                return (
-                  <Link 
-                    to="/search" 
-                    state={{ selectedCuisine: cuisine.strArea }}
-                    onClick={() => {
-                      localStorage.setItem('selectedCuisine', cuisine.strArea);
-                    }} 
-                    key={index} 
-                    className="cuisine-card"
-                    aria-label={`Browse ${cuisine.strArea} recipes`}
-                  >
-                    <div 
-                      className="cuisine-image" 
-                      style={{
-                        backgroundImage: `url(${cuisineDetails.image})`
-                      }}
-                    >
-                      <div className="cuisine-overlay">
-                        <div className="cuisine-icon">
-                          {getCuisineEmoji(cuisine.strArea)}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="cuisine-content">
-                      <h3 className="cuisine-name">{cuisine.strArea}</h3>
-                      <p className="cuisine-description">{cuisineDetails.description}</p>
-                    </div>
-                  </Link>
-                );
-              })}
+            <div className="cuisine-tabs">
+              <button 
+                className={`cuisine-tab ${activeCuisineTab === 'Popular' ? 'active' : ''}`}
+                onClick={() => setActiveCuisineTab('Popular')}
+              >
+                Popular
+              </button>
+              <button 
+                className={`cuisine-tab ${activeCuisineTab === 'Indian' ? 'active' : ''}`}
+                onClick={() => setActiveCuisineTab('Indian')}
+              >
+                Indian
+              </button>
+              <button 
+                className={`cuisine-tab ${activeCuisineTab === 'Asian' ? 'active' : ''}`}
+                onClick={() => setActiveCuisineTab('Asian')}
+              >
+                Asian
+              </button>
+              <button 
+                className={`cuisine-tab ${activeCuisineTab === 'European' ? 'active' : ''}`}
+                onClick={() => setActiveCuisineTab('European')}
+              >
+                European
+              </button>
             </div>
             
-            <div className="view-all-container">
-              <Link to="/search" className="view-all-link">
-                Explore All Cuisines
-              </Link>
-            </div>
+            {cuisineLoading ? (
+              <div className="cuisines-grid">
+                <Skeleton type="cuisine-card" count={window.innerWidth <= 480 ? 3 : 6} />
+              </div>
+            ) : (
+              <>
+                <div className="cuisines-grid">
+                  {getFilteredCuisines().map((cuisine, index) => {
+                    const cuisineDetails = getCuisineDetails(cuisine.strArea);
+                    const isIndian = cuisine.strArea === 'Indian';
+                    return (
+                      <Link 
+                        to="/search" 
+                        state={{ selectedCuisine: cuisine.strArea }}
+                        onClick={() => {
+                          localStorage.setItem('selectedCuisine', cuisine.strArea);
+                        }} 
+                        key={index} 
+                        className={`cuisine-card ${isIndian ? 'featured-cuisine' : ''}`}
+                        aria-label={`Browse ${cuisine.strArea} recipes`}
+                      >
+                        <div className="cuisine-image">
+                          <img 
+                            src={cuisineDetails.image} 
+                            alt={`${cuisine.strArea} cuisine`}
+                            loading="lazy"
+                          />
+                          <div className="cuisine-overlay">
+                            <div className="cuisine-hover-cta">
+                              <span className="cta-icon">→</span>
+                              <span className="cta-text">Explore Recipes</span>
+                            </div>
+                          </div>
+                          {isIndian && <div className="featured-badge">Popular Choice</div>}
+                        </div>
+                        <div className="cuisine-content">
+                          <h3 className="cuisine-name">{cuisine.strArea}</h3>
+                          <div className="cuisine-meta">
+                            <span className="meta-item">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                              </svg>
+                              {cuisineDetails.recipeCount}
+                            </span>
+                            <span className="meta-item spice-level">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                              </svg>
+                              {cuisineDetails.spiceLevel}
+                            </span>
+                            <span className="meta-item">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                              </svg>
+                              {cuisineDetails.cookTime}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+                
+                <div className="view-all-container">
+                  <Link to="/search" className="view-all-link">
+                    View All Cuisines
+                  </Link>
+                </div>
+              </>
+            )}
           </>
         )}
-      </section>
-
-      <section className="section featured-section">
-        <div className="section-header">
-          <h2 className="section-title">Featured Meals</h2>
-          <p className="section-subtitle">Discover something new and exciting today</p>
-        </div>
-        {loading ? (
-          <div className="meal-grid">
-            <Skeleton type="meal-card" count={3} />
-          </div>
-        ) : (
-          <div className="meal-grid">
-            {randomMeals.map(meal => (
-              <MealCard key={meal.idMeal ? meal.idMeal.toString() : meal.id.toString()} meal={meal} />
-            ))}
-          </div>
+        
+        {/* Featured Meals View */}
+        {activeView === 'meals' && (
+          <>
+            {loading ? (
+              <div className="meal-grid featured-meals-grid">
+                <Skeleton type="meal-card" count={6} />
+              </div>
+            ) : (
+              <>
+                <div className="meal-grid featured-meals-grid">
+                  {randomMeals.map(meal => (
+                    <MealCard key={meal.idMeal ? meal.idMeal.toString() : meal.id.toString()} meal={meal} />
+                  ))}
+                </div>
+                <div className="view-all-container">
+                  <Link to="/explore" className="view-all-link">
+                    Explore More Dishes
+                  </Link>
+                </div>
+              </>
+            )}
+          </>
         )}
       </section>
       
       <section className="section tools-section">
         <div className="section-header">
-          <h2 className="section-title">Explore Our Tools</h2>
-          <p className="section-subtitle">Make your cooking experience more enjoyable</p>
+          <h2 className="section-title">Power Up Your Cooking</h2>
+          <p className="section-subtitle">Unlock smart tools to plan, create, and perfect your meals</p>
         </div>
         <div className="tools-grid">
           <Link to="/ai-recipe-generator" className="tool-card ai-tool" aria-label="AI Recipe Generator Tool">
@@ -269,40 +424,5 @@ function Home() {
     </div>
   );
 }
-
-// Helper function to get an appropriate emoji for each cuisine
-const getCuisineEmoji = (cuisine) => {
-  const emojiMap = {
-    'American': '🇺🇸',
-    'British': '🇬🇧',
-    'Canadian': '🇨🇦',
-    'Chinese': '🇨🇳',
-    'Dutch': '🇳🇱',
-    'Egyptian': '🇪🇬',
-    'French': '🇫🇷',
-    'Greek': '🇬🇷',
-    'Indian': '🇮🇳',
-    'Irish': '🇮🇪',
-    'Italian': '🇮🇹',
-    'Jamaican': '🇯🇲',
-    'Japanese': '🇯🇵',
-    'Kenyan': '🇰🇪',
-    'Malaysian': '🇲🇾',
-    'Mexican': '🇲🇽',
-    'Moroccan': '🇲🇦',
-    'Polish': '🇵🇱',
-    'Portuguese': '🇵🇹',
-    'Russian': '🇷🇺',
-    'Spanish': '🇪🇸',
-    'Thai': '🇹🇭',
-    'Tunisian': '🇹🇳',
-    'Turkish': '🇹🇷',
-    'Vietnamese': '🇻🇳'
-  };
-
-  return emojiMap[cuisine] || '🌍';
-};
-
-
 
 export default Home;

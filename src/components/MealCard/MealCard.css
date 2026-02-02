@@ -120,146 +120,170 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   color: white;
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 4px;
+  z-index: 10;
+  backdrop-filter: blur(4px);
 }
 
 .time-icon {
-  font-size: 0.9rem;
+  font-size: 1rem;
+}
+
+/* Heart button on image */
+.meal-card-favorite-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.meal-card-favorite-overlay button {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.meal-card-favorite-overlay button:hover {
+  transform: scale(1.1);
+  background: white;
+}
+
+.meal-card-favorite-overlay button {
+  width: 32px;
+  height: 32px;
 }
 
 .meal-card-content {
-  padding: 1.2rem;
+  padding: 0.85rem;
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 140px; /* Added to ensure consistent card height */
-}
-
-.meal-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.5rem;
 }
 
 .meal-card-title {
   margin: 0 0 0.5rem;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: calc(100% - 40px);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  line-height: 1.3;
+  min-height: 2.4rem;
 }
 
 .meal-card-title a {
   color: #333;
   transition: color 0.3s ease;
   text-decoration: none;
+  font-weight: 600;
 }
 
 .meal-card-title a:hover {
   color: #a0430a;
 }
 
-.meal-card-favorite {
-  /* Moved from image container to content area */
-  margin-top: 3px;
-}
-
-.meal-card-meta {
-  font-size: 0.85rem;
-  color: #666;
-  margin-bottom: 1rem;
+/* New Tag System */
+.meal-card-tags {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-}
-
-.meal-card-area {
-  display: inline-flex;
-  align-items: center;
-  font-weight: 500;
-}
-
-.meal-card-area:before {
-  content: "🌍";
-  margin-right: 5px;
-}
-
-.dietary-indicators {
-  display: flex;
-  gap: 6px;
-}
-
-.dietary-tag {
-  font-size: 0.95rem;
-  opacity: 0.8;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.dietary-tag:hover {
-  opacity: 1;
-  transform: scale(1.2);
-}
-
-.meal-card-button {
-  display: block;
-  background-color: #a0430a;
-  color: #fff;
-  text-align: center;
-  padding: 0.7rem 0.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-decoration: none;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-top: auto;
 }
 
-.meal-card-button:hover {
-  background-color: #c25a1f;
-  color: #fff;
-  transform: translateY(-2px);
+.meal-tag {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.category-tag {
+  background: rgba(160, 67, 10, 0.1);
+  color: #a0430a;
+  border: 1px solid rgba(160, 67, 10, 0.2);
+}
+
+.cuisine-tag {
+  background: rgba(52, 152, 219, 0.1);
+  color: #2c3e50;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.dietary-tag {
+  background: rgba(46, 204, 113, 0.1);
+  color: #27ae60;
+  border: 1px solid rgba(46, 204, 113, 0.2);
 }
 
 @media (max-width: 768px) {
   .meal-card-image-container {
-    height: 140px; /* Changed from 180px to match cuisine cards */
+    height: 140px;
   }
   
   .meal-card-content {
-    padding: 1rem;
+    padding: 0.9rem;
   }
   
   .meal-card-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    min-height: 2.6rem;
+  }
+
+  .meal-tag {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
   }
 }
 
 @media (max-width: 480px) {
   .meal-card-image-container {
-    height: 120px; /* Changed from 200px to match cuisine card mobile height */
+    height: 120px;
   }
   
   .meal-card {
     border-radius: 10px;
   }
   
-  .meal-card-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+  .meal-card-title {
+    font-size: 0.9rem;
+    min-height: 2.4rem;
   }
-  
-  .dietary-indicators {
-    margin-top: 4px;
+
+  .meal-card-tags {
+    gap: 0.4rem;
+  }
+
+  .meal-tag {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .meal-card-time {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+
+  .meal-card-favorite-overlay button {
+    width: 32px;
+    height: 32px;
   }
 }
