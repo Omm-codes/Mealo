@@ -19,16 +19,23 @@ function Home() {
     const cacheTime = localStorage.getItem('homePageCacheTime');
     const currentTime = new Date().getTime();
     const thirtyMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
-    
+
     const shouldRefreshCache = !cacheTime || (currentTime - parseInt(cacheTime)) > thirtyMinutes;
 
     const loadRandomMeals = async () => {
       if (!shouldRefreshCache && cachedRandomMeals) {
-        setRandomMeals(JSON.parse(cachedRandomMeals));
-        setLoading(false);
-        return;
+        try {
+          setRandomMeals(JSON.parse(cachedRandomMeals));
+          setLoading(false);
+          return;
+        } catch (parseError) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.error('Failed to parse cached random meals:', parseError);
+          }
+          // Continue to fetch fresh data below
+        }
       }
-      
+
       setLoading(true);
       try {
         const meals = await fetchPopularMeals(3);
@@ -36,7 +43,9 @@ function Home() {
         // Cache the results
         localStorage.setItem('cachedRandomMeals', JSON.stringify(meals));
       } catch (error) {
-        console.error('Error fetching random meals:', error);
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Error fetching random meals:', error);
+        }
       }
       setLoading(false);
     };

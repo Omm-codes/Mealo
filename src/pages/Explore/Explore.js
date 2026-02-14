@@ -7,29 +7,29 @@ import './Explore.css';
 
 // Main tabs for navigation
 const mainTabs = [
-  { id: 'Popular', name: 'Popular', icon: '🔥' },
-  { id: 'Trending', name: 'Trending', icon: '⚡' },
-  { id: 'Quick', name: 'Quick', icon: '⏱️' },
-  { id: 'Indian', name: 'Indian', icon: '🍛' },
-  { id: 'Random', name: 'Random', icon: '🎲' }
+  { id: 'Popular', name: 'Popular'  },
+  { id: 'Trending', name: 'Trending'  },
+  { id: 'Quick', name: 'Quick' },
+  { id: 'Indian', name: 'Indian' },
+  { id: 'Random', name: 'Random' }
 ];
 
 // Quick filter chips
 const quickFilters = [
-  { id: 'Vegetarian', name: 'Vegetarian', icon: '🥗' },
-  { id: 'Under30', name: 'Under 30 mins', icon: '⚡' },
-  { id: 'HighProtein', name: 'High Protein', icon: '💪' },
-  { id: 'LowCarb', name: 'Low Carb', icon: '🥑' }
+  { id: 'Vegetarian', name: 'Vegetarian'  },
+  { id: 'Under30', name: 'Under 30 mins'  },
+  { id: 'HighProtein', name: 'High Protein'  },
+  { id: 'LowCarb', name: 'Low Carb'  }
 ];
 
 // Cuisines for exploration
 const cuisines = [
-  { id: 'Indian', name: 'Indian', flag: '🇮🇳', image: '🍛' },
-  { id: 'Italian', name: 'Italian', flag: '🇮🇹', image: '🍝' },
-  { id: 'Chinese', name: 'Chinese', flag: '🇨🇳', image: '🥡' },
-  { id: 'Mexican', name: 'Mexican', flag: '🇲🇽', image: '🌮' },
-  { id: 'Thai', name: 'Thai', flag: '🇹🇭', image: '🍜' },
-  { id: 'Japanese', name: 'Japanese', flag: '🇯🇵', image: '🍱' }
+  { id: 'Indian', name: 'Indian', flag: '🇮🇳' },
+  { id: 'Italian', name: 'Italian', flag: '🇮🇹' },
+  { id: 'Chinese', name: 'Chinese', flag: '🇨🇳'},
+  { id: 'Mexican', name: 'Mexican', flag: '🇲🇽' },
+  { id: 'Thai', name: 'Thai', flag: '🇹🇭',  },
+  { id: 'Japanese', name: 'Japanese', flag: '🇯🇵' }
 ];
 
 function Explore() {
@@ -64,7 +64,9 @@ function Explore() {
       const meals = results.filter(meal => meal !== null);
       setFeaturedRecipes(meals);
     } catch (error) {
-      console.error('Error loading featured recipes:', error);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Error loading featured recipes:', error);
+      }
     }
     setFeaturedLoading(false);
   };
@@ -79,10 +81,20 @@ function Explore() {
 
     // Check cache
     if (cachedData && cacheTime && (currentTime - parseInt(cacheTime)) < thirtyMinutes) {
-      setRecipes(JSON.parse(cachedData));
-      setHasMore(JSON.parse(cachedData).length >= 12);
-      setLoading(false);
-      return;
+      try {
+        const parsedData = JSON.parse(cachedData);
+        setRecipes(parsedData);
+        setHasMore(parsedData.length >= 12);
+        setLoading(false);
+        return;
+      } catch (parseError) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Failed to parse cached explore data:', parseError);
+        }
+        // Clear invalid cache and continue to fetch fresh data
+        localStorage.removeItem(cacheKey);
+        localStorage.removeItem(cacheTimeKey);
+      }
     }
 
     setLoading(true);
@@ -306,14 +318,14 @@ function Explore() {
       {/* Quick Actions Footer */}
       <section className="quick-actions">
         <Link to="/categories" className="action-card">
-          <span className="action-icon">📁</span>
+          <span className="action-icon"></span>
           <div>
             <h3>All Categories</h3>
             <p>Browse by meal type</p>
           </div>
         </Link>
         <Link to="/search" className="action-card">
-          <span className="action-icon">🔍</span>
+          <span className="action-icon"></span>
           <div>
             <h3>Advanced Search</h3>
             <p>Filter by ingredients</p>

@@ -15,8 +15,16 @@ function FavoriteButton({ mealId, meal }) {
       setIsFavorite(favorite);
     } else {
       // Check localStorage for non-logged-in users
-      const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-      setIsFavorite(favorites.some(fav => fav.idMeal === mealId || fav === mealId));
+      try {
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        setIsFavorite(favorites.some(fav => fav.idMeal === mealId || fav === mealId));
+      } catch (parseError) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Failed to parse favorites from localStorage:', parseError);
+        }
+        setIsFavorite(false);
+        localStorage.removeItem('favorites');
+      }
     }
   }, [currentUser, mealId]);
   
@@ -26,10 +34,10 @@ function FavoriteButton({ mealId, meal }) {
   
   const toggleFavorite = async (e) => {
     e.preventDefault(); // Prevent navigation if inside a link
-    
+
     if (loading) return;
     setLoading(true);
-    
+
     if (currentUser) {
       // Use Firestore for logged-in users
       if (isFavorite) {
@@ -39,20 +47,29 @@ function FavoriteButton({ mealId, meal }) {
       }
     } else {
       // Use localStorage for non-logged-in users
-      const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-      let updatedFavorites;
-      
-      if (isFavorite) {
-        updatedFavorites = favorites.filter(fav => 
-          (typeof fav === 'object' ? fav.idMeal : fav) !== mealId
-        );
-      } else {
-        updatedFavorites = [...favorites, meal || { idMeal: mealId }];
+      try {
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        let updatedFavorites;
+
+        if (isFavorite) {
+          updatedFavorites = favorites.filter(fav =>
+            (typeof fav === 'object' ? fav.idMeal : fav) !== mealId
+          );
+        } else {
+          updatedFavorites = [...favorites, meal || { idMeal: mealId }];
+        }
+
+        localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      } catch (parseError) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Failed to parse/update favorites in localStorage:', parseError);
+        }
+        // If parse fails, create a new favorites array
+        const newFavorites = isFavorite ? [] : [meal || { idMeal: mealId }];
+        localStorage.setItem('favorites', JSON.stringify(newFavorites));
       }
-      
-      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     }
-    
+
     setIsFavorite(!isFavorite);
     setLoading(false);
   };

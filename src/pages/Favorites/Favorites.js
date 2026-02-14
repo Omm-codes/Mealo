@@ -13,7 +13,7 @@ function Favorites() {
 
   const loadFavorites = useCallback(async () => {
     setLoading(true);
-    
+
     if (currentUser) {
       // Load from Firestore for logged-in users
       const result = await getFavorites(currentUser.uid);
@@ -22,10 +22,18 @@ function Favorites() {
       }
     } else {
       // Load from localStorage for non-logged-in users
-      const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-      setFavorites(savedFavorites);
+      try {
+        const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        setFavorites(savedFavorites);
+      } catch (parseError) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Failed to parse favorites from localStorage:', parseError);
+        }
+        setFavorites([]);
+        localStorage.removeItem('favorites');
+      }
     }
-    
+
     setLoading(false);
   }, [currentUser]);
 

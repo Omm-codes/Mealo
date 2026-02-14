@@ -35,13 +35,17 @@ const formatSpoonacularRecipeCard = (recipe) => {
 
 // Helper function to format meal data from Spoonacular to match our app's expected structure
 const formatSpoonacularMeal = (meal) => {
+  const imageUrl = meal.image && meal.image.startsWith('http')
+    ? meal.image
+    : meal.id
+      ? `https://spoonacular.com/recipeImages/${meal.id}-556x370.jpg`
+      : 'https://via.placeholder.com/300x200?text=No+Image';
+
   return {
     id: meal.id ? meal.id.toString() : '', // Always string for Spoonacular
     idMeal: meal.id ? meal.id.toString() : '', // For compatibility
     strMeal: meal.title,
-    strMealThumb: meal.image.startsWith('http') 
-      ? meal.image 
-      : `https://spoonacular.com/recipeImages/${meal.id}-556x370.jpg`, // Use higher resolution
+    strMealThumb: imageUrl,
     strCategory: meal.dishTypes && meal.dishTypes.length > 0 ? meal.dishTypes[0] : 'Main Course',
     strArea: meal.cuisines && meal.cuisines.length > 0 ? meal.cuisines[0] : 'International',
     strInstructions: meal.instructions || '',
@@ -83,7 +87,9 @@ export const fetchRandomMeal = async () => {
     const data = await response.json();
     return data.meals ? markMealDBMeal(data.meals[0]) : null;
   } catch (error) {
-    console.error('Error fetching random meal:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error fetching random meal:', error);
+    }
     return null; // Return null instead of throwing to allow graceful handling
   }
 };
@@ -98,7 +104,9 @@ export const fetchMealById = async (id, options = {}) => {
         const data = await response.json();
         return formatSpoonacularMeal(data);
       } catch (spoonError) {
-        console.error('Spoonacular fetch failed:', spoonError);
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Spoonacular fetch failed:', spoonError);
+        }
         return null;
       }
     }
@@ -108,7 +116,9 @@ export const fetchMealById = async (id, options = {}) => {
     const data = await response.json();
     return data.meals ? markMealDBMeal(data.meals[0]) : null;
   } catch (error) {
-    console.error(`Error fetching meal ${id}:`, error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`Error fetching meal ${id}:`, error);
+    }
     throw error;
   }
 };
@@ -119,19 +129,21 @@ export const searchMealsByNamePaginated = async (query, offset = 0, limit = 12) 
     const response = await fetch(`${MEAL_DB_BASE_URL}/search.php?s=${query}`);
     const data = await response.json();
     const meals = data.meals ? data.meals.map(meal => markMealDBMeal(meal)) : [];
-    
+
     // Simulate pagination for TheMealDB (since it doesn't support it natively)
     const startIndex = offset;
     const endIndex = startIndex + limit;
     const paginatedMeals = meals.slice(startIndex, endIndex);
-    
+
     return {
       meals: paginatedMeals,
       totalCount: meals.length,
       hasMore: endIndex < meals.length
     };
   } catch (error) {
-    console.error('Error searching meals:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error searching meals:', error);
+    }
     return { meals: [], totalCount: 0, hasMore: false };
   }
 };
@@ -143,7 +155,9 @@ export const searchMealsByName = async (query) => {
     const data = await response.json();
     return data.meals ? data.meals.map(meal => markMealDBMeal(meal)) : [];
   } catch (error) {
-    console.error('Error searching meals:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error searching meals:', error);
+    }
     throw error;
   }
 };
@@ -154,18 +168,20 @@ export const fetchMealsByCategoryPaginated = async (category, offset = 0, limit 
     const response = await fetch(`${MEAL_DB_BASE_URL}/filter.php?c=${category}`);
     const data = await response.json();
     const meals = data.meals ? data.meals.map(meal => markMealDBMeal(meal)) : [];
-    
+
     const startIndex = offset;
     const endIndex = startIndex + limit;
     const paginatedMeals = meals.slice(startIndex, endIndex);
-    
+
     return {
       meals: paginatedMeals,
       totalCount: meals.length,
       hasMore: endIndex < meals.length
     };
   } catch (error) {
-    console.error(`Error fetching meals for category ${category}:`, error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`Error fetching meals for category ${category}:`, error);
+    }
     return { meals: [], totalCount: 0, hasMore: false };
   }
 };
@@ -177,7 +193,9 @@ export const fetchMealsByCategory = async (category) => {
     const data = await response.json();
     return data.meals ? data.meals.map(meal => markMealDBMeal(meal)) : [];
   } catch (error) {
-    console.error(`Error fetching meals for category ${category}:`, error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`Error fetching meals for category ${category}:`, error);
+    }
     throw error;
   }
 };
@@ -185,21 +203,30 @@ export const fetchMealsByCategory = async (category) => {
 // Get popular meals from TheMealDB instead of Spoonacular
 export const fetchPopularMeals = async (count = 6) => {
   try {
-    const meals = [];
     const maxAttempts = count * 2; // Try more to get unique meals
     const seenIds = new Set();
-    
-    for (let i = 0; i < maxAttempts && meals.length < count; i++) {
-      const meal = await fetchRandomMeal();
-      if (meal && !seenIds.has(meal.idMeal)) {
-        seenIds.add(meal.idMeal);
-        meals.push(meal);
+
+    // Batch fetch meals in parallel
+    const fetchBatch = async () => {
+      const promises = Array(maxAttempts).fill(null).map(() => fetchRandomMeal());
+      const results = await Promise.all(promises);
+
+      const uniqueMeals = [];
+      for (const meal of results) {
+        if (meal && !seenIds.has(meal.idMeal) && uniqueMeals.length < count) {
+          seenIds.add(meal.idMeal);
+          uniqueMeals.push(meal);
+        }
       }
-    }
-    
-    return meals;
+
+      return uniqueMeals;
+    };
+
+    return await fetchBatch();
   } catch (error) {
-    console.error('Error fetching popular meals:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error fetching popular meals:', error);
+    }
     return [];
   }
 };
@@ -211,7 +238,9 @@ export const fetchMealsByArea = async (area) => {
     const data = await response.json();
     return data.meals ? data.meals.map(meal => markMealDBMeal(meal)) : [];
   } catch (error) {
-    console.error(`Error fetching meals for area ${area}:`, error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`Error fetching meals for area ${area}:`, error);
+    }
     throw error;
   }
 };
@@ -223,7 +252,9 @@ export const fetchCategories = async () => {
     const data = await response.json();
     return data.categories || [];
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error fetching categories:', error);
+    }
     throw error;
   }
 };
@@ -235,7 +266,9 @@ export const fetchAreas = async () => {
     const data = await response.json();
     return data.meals || [];
   } catch (error) {
-    console.error('Error fetching areas:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error fetching areas:', error);
+    }
     throw error;
   }
 };
@@ -246,25 +279,29 @@ export const fetchAreas = async () => {
 export const advancedRecipeSearch = async (params) => {
   try {
     // Only use Spoonacular for truly advanced searches
-    const isAdvancedSearch = params.diet || params.intolerances || params.maxReadyTime || 
+    const isAdvancedSearch = params.diet || params.intolerances || params.maxReadyTime ||
                            params.sort === 'popularity' || params.cuisine;
-    
+
     if (!isAdvancedSearch && params.query) {
       // Use TheMealDB for basic searches
-      console.log('Using TheMealDB for basic search');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Using TheMealDB for basic search');
+      }
       const result = await searchMealsByNamePaginated(params.query, 0, params.number || 10);
       return result.meals;
     }
-    
+
     // Use Spoonacular for advanced features
-    console.log('Using Spoonacular for advanced search');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Using Spoonacular for advanced search');
+    }
     const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value;
       }
       return acc;
     }, {});
-    
+
     const queryParams = new URLSearchParams({
       apiKey: SPOONACULAR_API_KEY,
       ...cleanParams,
@@ -277,26 +314,32 @@ export const advancedRecipeSearch = async (params) => {
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     if (data.code && data.message) {
-      console.error("Spoonacular API error:", data.message);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error("Spoonacular API error:", data.message);
+      }
       return [];
     }
-    
+
     if (!data.results || !Array.isArray(data.results)) {
-      console.error("Unexpected data format:", data);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error("Unexpected data format:", data);
+      }
       return [];
     }
-    
+
     const formattedResults = data.results
       .map(recipe => formatSpoonacularRecipeCard(recipe))
       .filter(recipe => recipe !== null);
-      
+
     return formattedResults;
   } catch (error) {
-    console.error('Error performing advanced recipe search:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error performing advanced recipe search:', error);
+    }
     return [];
   }
 };
@@ -308,7 +351,9 @@ export const getNutritionInfo = async (id) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(`Error fetching nutrition info for meal ${id}:`, error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`Error fetching nutrition info for meal ${id}:`, error);
+    }
     throw error;
   }
 };
@@ -318,11 +363,15 @@ export const getAIRecipeSuggestions = async (ingredients, preferences = '') => {
   try {
     // Validate API key
     if (!GROQ_API_KEY) {
-      console.error('GROQ API key is not configured');
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('GROQ API key is not configured');
+      }
       throw new Error('AI service is not configured. Please check your API keys.');
     }
 
-    console.log('Sending request to Groq API with ingredients:', ingredients);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Sending request to Groq API with ingredients:', ingredients);
+    }
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -349,53 +398,73 @@ export const getAIRecipeSuggestions = async (ingredients, preferences = '') => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Groq API error response:', errorText);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Groq API error response:', errorText);
+      }
       throw new Error(`API request failed with status ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Groq API response:', data);
-    
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Groq API response:', data);
+    }
+
     if (data.error) {
-      console.error('Groq API returned error:', data.error);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Groq API returned error:', data.error);
+      }
       throw new Error(data.error.message || 'API returned an error');
     }
 
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Unexpected API response structure:', data);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Unexpected API response structure:', data);
+      }
       throw new Error('Invalid response from AI service');
     }
 
     // Parse the response content to extract the JSON
     const content = data.choices[0].message.content;
-    console.log('AI response content:', content);
-    
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('AI response content:', content);
+    }
+
     // Try to find and parse JSON in the response
     const jsonMatch = content.match(/\[[\s\S]*\]/);
-    
+
     if (jsonMatch) {
       try {
         const recipes = JSON.parse(jsonMatch[0]);
-        
+
         // Validate the structure of recipes
         if (Array.isArray(recipes) && recipes.length > 0) {
-          console.log('Successfully parsed recipes:', recipes);
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('Successfully parsed recipes:', recipes);
+          }
           return recipes;
         } else {
-          console.error('Parsed JSON is not a valid array of recipes:', recipes);
+          if (process.env.NODE_ENV !== 'production') {
+            console.error('Parsed JSON is not a valid array of recipes:', recipes);
+          }
           throw new Error('Invalid recipe format returned');
         }
       } catch (parseError) {
-        console.error('Failed to parse AI response JSON:', parseError);
-        console.error('Content that failed to parse:', jsonMatch[0]);
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Failed to parse AI response JSON:', parseError);
+          console.error('Content that failed to parse:', jsonMatch[0]);
+        }
         throw new Error('Failed to parse recipe data from AI');
       }
     } else {
-      console.error('No JSON array found in response:', content);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('No JSON array found in response:', content);
+      }
       throw new Error('AI did not return recipe data in expected format');
     }
   } catch (error) {
-    console.error('Error getting AI recipe suggestions:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error getting AI recipe suggestions:', error);
+    }
     throw error; // Re-throw to let the component handle it
   }
 };
@@ -407,7 +476,9 @@ export const getWinePairing = async (food) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error getting wine pairing:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error getting wine pairing:', error);
+    }
     throw error;
   }
 };
@@ -419,15 +490,17 @@ export const getMealPlanByDiet = async (diet, calories, timeFrame = 'day') => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error generating meal plan:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error generating meal plan:', error);
+    }
     throw error;
   }
 };
 
 // Helper function to check if a meal has nutrition data available
 export const hasNutritionData = (meal) => {
-  // Check if the meal is from Spoonacular (numeric ID) or has the hasNutritionData flag set to true
-  return (meal && (meal.hasNutritionData === true || (meal.idMeal && /^\d+$/.test(meal.idMeal))));
+  // Only Spoonacular meals have nutrition data
+  return meal && meal.apiSource === 'spoonacular';
 };
 
 // Utility function to check if cached data is still valid
@@ -446,27 +519,44 @@ export const isCacheValid = (cacheKey, expiryInMinutes = 30) => {
 // Get cached data if valid, otherwise fetch new data
 export const getCachedOrFetch = async (cacheKey, fetchFunction, expiryInMinutes = 30) => {
   const cachedData = localStorage.getItem(cacheKey);
-  
+
   if (cachedData && isCacheValid(cacheKey, expiryInMinutes)) {
-    return JSON.parse(cachedData);
+    try {
+      return JSON.parse(cachedData);
+    } catch (error) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Failed to parse cached data:', error);
+      }
+      // Clear invalid cache
+      localStorage.removeItem(cacheKey);
+      localStorage.removeItem(`${cacheKey}_time`);
+    }
   }
-  
+
   // Cache miss or expired, fetch new data
   const freshData = await fetchFunction();
-  
+
   // Cache the new data
-  localStorage.setItem(cacheKey, JSON.stringify(freshData));
-  localStorage.setItem(`${cacheKey}_time`, new Date().getTime().toString());
-  
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(freshData));
+    localStorage.setItem(`${cacheKey}_time`, new Date().getTime().toString());
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Failed to cache data:', error);
+    }
+  }
+
   return freshData;
 };
 
 // Test function to verify GROQ API key is working
 export const testGroqAPI = async () => {
   try {
-    console.log('Testing GROQ API key...');
-    console.log('API Key exists:', !!GROQ_API_KEY);
-    console.log('API Key starts with gsk_:', GROQ_API_KEY?.startsWith('gsk_'));
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Testing GROQ API key...');
+      console.log('API Key exists:', !!GROQ_API_KEY);
+      console.log('API Key starts with gsk_:', GROQ_API_KEY?.startsWith('gsk_'));
+    }
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -486,19 +576,27 @@ export const testGroqAPI = async () => {
       })
     });
 
-    console.log('Response status:', response.status);
-    
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Response status:', response.status);
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API Error:', errorText);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('API Error:', errorText);
+      }
       return { success: false, error: errorText };
     }
 
     const data = await response.json();
-    console.log('API Response:', data);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('API Response:', data);
+    }
     return { success: true, data };
   } catch (error) {
-    console.error('Test failed:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Test failed:', error);
+    }
     return { success: false, error: error.message };
   }
 };

@@ -110,12 +110,23 @@ function Search() {
         const areasCacheTime = localStorage.getItem('areasCacheTime');
         const currentTime = new Date().getTime();
         const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours
-        
+
         // Areas/cuisines don't change often, we can cache them for 24 hours
         const shouldRefreshAreasCache = !areasCacheTime || (currentTime - parseInt(areasCacheTime)) > oneDayInMs;
-        
+
         if (!shouldRefreshAreasCache && cachedAreas) {
-          setAreas(JSON.parse(cachedAreas));
+          try {
+            setAreas(JSON.parse(cachedAreas));
+          } catch (parseError) {
+            if (process.env.NODE_ENV !== 'production') {
+              console.error('Failed to parse cached areas:', parseError);
+            }
+            // Fetch fresh data if parse fails
+            const areasData = await fetchAreas();
+            setAreas(areasData);
+            localStorage.setItem('cachedAreas', JSON.stringify(areasData));
+            localStorage.setItem('areasCacheTime', currentTime.toString());
+          }
         } else {
           const areasData = await fetchAreas();
           setAreas(areasData);
@@ -123,18 +134,29 @@ function Search() {
           localStorage.setItem('cachedAreas', JSON.stringify(areasData));
           localStorage.setItem('areasCacheTime', currentTime.toString());
         }
-        
+
         // Check for cached popular meals
         const cachedPopularMeals = localStorage.getItem('cachedPopularMeals');
         const popularMealsCacheTime = localStorage.getItem('popularMealsCacheTime');
         const oneHourInMs = 60 * 60 * 1000; // 1 hour
-        
-        const shouldRefreshPopularMealsCache = !popularMealsCacheTime || 
+
+        const shouldRefreshPopularMealsCache = !popularMealsCacheTime ||
           (currentTime - parseInt(popularMealsCacheTime)) > oneHourInMs;
-        
+
         try {
           if (!shouldRefreshPopularMealsCache && cachedPopularMeals) {
-            setPopularMeals(JSON.parse(cachedPopularMeals));
+            try {
+              setPopularMeals(JSON.parse(cachedPopularMeals));
+            } catch (parseError) {
+              if (process.env.NODE_ENV !== 'production') {
+                console.error('Failed to parse cached popular meals:', parseError);
+              }
+              // Fetch fresh data if parse fails
+              const popularRecipes = await fetchPopularMeals(6);
+              setPopularMeals(popularRecipes);
+              localStorage.setItem('cachedPopularMeals', JSON.stringify(popularRecipes));
+              localStorage.setItem('popularMealsCacheTime', currentTime.toString());
+            }
           } else {
             const popularRecipes = await fetchPopularMeals(6);
             setPopularMeals(popularRecipes);
@@ -143,7 +165,9 @@ function Search() {
             localStorage.setItem('popularMealsCacheTime', currentTime.toString());
           }
         } catch (popularError) {
-          console.error('Error fetching popular meals:', popularError);
+          if (process.env.NODE_ENV !== 'production') {
+            console.error('Error fetching popular meals:', popularError);
+          }
           setPopularMeals([]);
         }
       } catch (error) {
